@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons'; // Back arrow icon
+import Icon from 'react-native-vector-icons/MaterialIcons'; 
+import { Color } from '../../Utils/Theme';
 
 const CreateAccountScreen = ({ navigation }) => {
   return (
@@ -50,7 +51,7 @@ const CreateAccountScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAF4', // Light background color
+    backgroundColor: Color.background, // Light background color
     paddingHorizontal: 20,
     paddingTop: 50,
   },
@@ -81,7 +82,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   verifyButton: {
-    backgroundColor: '#32CD32', // Light green
+    backgroundColor: Color.primary, // Light green
     borderRadius: 8,
     paddingVertical: 15,
     alignItems: 'center',
@@ -90,7 +91,7 @@ const styles = StyleSheet.create({
   verifyButtonText: {
     fontSize: 16,
     fontFamily: 'AlbertSans-Bold',
-    color: '#fff',
+    color: Color.secondary,
   },
   loginContainer: {
     flexDirection: 'row',
@@ -105,12 +106,12 @@ const styles = StyleSheet.create({
   loginLink: {
     fontSize: 14,
     fontFamily: 'AlbertSans-Medium',
-    color: '#32CD32', // Light green color for the link
+    color: Color.secondary,
   },
   termsText: {
     fontSize: 12,
     fontFamily: 'AlbertSans-Medium',
-    color: '#666',
+    color: Color.secondary,
     textAlign: 'center',
   },
   link: {

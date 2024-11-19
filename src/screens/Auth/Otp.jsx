@@ -8,6 +8,7 @@ import {
   StatusBar,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons'; // Back arrow icon
+import { Color } from '../../Utils/Theme';
 
 const CreateAccount = ({ navigation }) => {
   const [countdown, setCountdown] = useState(10);
@@ -65,7 +66,7 @@ const CreateAccount = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F8F8',
+    backgroundColor: Color.background,
     paddingHorizontal: 20,
   },
   backButton: {
@@ -103,19 +104,19 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 18,
     borderRadius: 10,
-    backgroundColor: '#FFF',
+  
   },
   button: {
-    backgroundColor: '#32CD32',
+    backgroundColor: Color.primary,
     borderRadius: 25,
     paddingVertical: 15,
     alignItems: 'center',
     marginBottom: 10,
   },
   buttonText: {
-    color: '#FFF',
+    color: Color.secondary,
     fontSize: 16,
-    fontFamily: 'AlbertSans-Medium',
+    fontFamily: 'AlbertSans-Bold',
   },
   resendText: {
     fontSize: 14,
@@ -125,12 +126,12 @@ const styles = StyleSheet.create({
   },
   loginText: {
     fontSize: 14,
-    color: '#666',
+        color: Color.secondary,
     marginBottom: 20,
     fontFamily: 'AlbertSans-Medium',
   },
   link: {
-    color: '#32CD32',
+    color: Color.secondary,
     textDecorationLine: 'underline',
     fontFamily: 'AlbertSans-Medium',
   },

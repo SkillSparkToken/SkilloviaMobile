@@ -8,6 +8,7 @@ import {
   StatusBar,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { Color } from '../Utils/Theme';
 
 const Onboarding = ({ navigation }) => {
   return (
@@ -140,7 +141,7 @@ const styles = StyleSheet.create({
     fontFamily: 'AlbertSans-Light',
   },
   createAccountButton: {
-    backgroundColor: '#32CD32',
+    backgroundColor: Color.primary,
     width: '100%',
     paddingVertical: 15,
     borderRadius: 25,
@@ -150,7 +151,7 @@ const styles = StyleSheet.create({
   },
   createAccountText: {
     fontSize: 16,
-    color: '#fff',
+    color: Color.secondary,
     
     fontFamily: 'AlbertSans-Bold',
   },
