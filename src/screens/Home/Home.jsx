@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import { SafeAreaView, View, Text, StyleSheet, TextInput, TouchableOpacity, Image, FlatList, StatusBar } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
