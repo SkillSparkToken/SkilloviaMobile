@@ -42,7 +42,7 @@ const PersonalDetails = ({ navigation }) => {
         <TextInput style={styles.input} placeholder="Select gender" />
         <TextInput style={styles.input} placeholder="Enter your password" secureTextEntry />
 
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity onPress={() => navigation.navigate('welcome')} style={styles.button}>
           <Text style={styles.buttonText}>Create account</Text>
         </TouchableOpacity>
 
