@@ -1,18 +1,18 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, StatusBar,   TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { Color } from '../../Utils/Theme';
 
-const Profile = () => {
+const Profile = ({navigation}) => {
   return (
     <ScrollView style={styles.container}>
       <StatusBar translucent={true} barStyle="dark-content" hidden={false} />
       
-      <View style={styles.header}>
+      <TouchableOpacity onPress={() => navigation.navigate('settings')} style={styles.header}>
         <Text style={styles.headerText}>Profile</Text>
         <FontAwesome name="gear" size={20} color="black" />
-      </View>
+      </TouchableOpacity>
       
       <View style={styles.profileSection}>
         <Image

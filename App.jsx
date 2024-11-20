@@ -14,6 +14,7 @@ import Home from './src/screens/Home/Home';
 import Community from './src/screens/Community/Community';
 import Profile from './src/screens/Profile/Profile';
 import Booking from './src/screens/Booking/Booking';
+import SettingsScreen from './src/screens/Settings/Settings';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -98,6 +99,12 @@ const App = () => {
         <Stack.Screen
           name="home"
           component={HomeTabs} // Use Tab Navigator for Home
+          options={{ headerShown: false }}
+        />
+
+<Stack.Screen
+          name="settings"
+          component={SettingsScreen} // Use Tab Navigator for Home
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
