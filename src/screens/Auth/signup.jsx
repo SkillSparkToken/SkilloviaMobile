@@ -63,6 +63,7 @@ const styles = StyleSheet.create({
     fontFamily: 'AlbertSans-Medium',
     color: '#000',
     marginBottom: 20,
+    
   },
   label: {
     fontSize: 14,
