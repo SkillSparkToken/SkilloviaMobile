@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import LoginScreen from './src/screens/Auth/Login';
 import Onboarding from './src/screens/Onboarding';
@@ -9,12 +9,12 @@ import ForgotPasswordScreen from './src/screens/Auth/ForgotPsw';
 import Otp from './src/screens/Auth/Otp';
 import PersonalDetails from './src/screens/Auth/PersonalDetails';
 import WelcomeScreen from './src/screens/Auth/WelocmeScreen';
-
 import Icon from 'react-native-vector-icons/Ionicons';
 import Home from './src/screens/Home/Home';
 import Community from './src/screens/Community/Community';
 import Profile from './src/screens/Profile/Profile';
 import Booking from './src/screens/Booking/Booking';
+import SettingsScreen from './src/screens/Settings/Settings';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -23,29 +23,27 @@ const Tab = createBottomTabNavigator();
 const HomeTabs = () => {
   return (
     <Tab.Navigator
+   
       screenOptions={({ route }) => ({
+        animation: 'shift',
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
 
           if (route.name === 'Home') {
             iconName = focused ? 'search' : 'search';
-          }     else if (route.name === 'Booking') {
-            iconName = focused ? 'person' : 'person-outline';
-          }
-          
-          else if (route.name === 'Community') {
+          } else if (route.name === 'Booking') {
+            iconName = focused ? 'calendar' : 'calendar-outline';
+          } else if (route.name === 'Community') {
             iconName = focused ? 'people' : 'people-outline';
           } else if (route.name === 'Profile') {
             iconName = focused ? 'person' : 'person-outline';
           }
 
-      
-
           return <Icon name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: '#32CD32',
         tabBarInactiveTintColor: 'gray',
-        tabBarLabelStyle: { fontFamily: 'AlbertSans-Medium' }, // Apply the font here
+        tabBarLabelStyle: { fontFamily: 'AlbertSans-Medium',  animation: 'shift',  }, // Apply the font here
       })}
     >
       <Tab.Screen name="Home" component={Home} options={{ headerShown: false }} />
@@ -59,7 +57,12 @@ const HomeTabs = () => {
 const App = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="onboard">
+      <Stack.Navigator
+        initialRouteName="onboard"
+        screenOptions={{
+          cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS, 
+        }}
+      >
         <Stack.Screen
           name="onboard"
           component={Onboarding}
@@ -97,7 +100,13 @@ const App = () => {
         />
         <Stack.Screen
           name="home"
-          component={HomeTabs} // Use Tab Navigator for Home
+          component={HomeTabs} 
+          options={{ headerShown: false }}
+        />
+
+<Stack.Screen
+          name="settings"
+          component={SettingsScreen} 
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
