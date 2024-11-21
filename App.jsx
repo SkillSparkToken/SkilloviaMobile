@@ -23,7 +23,9 @@ const Tab = createBottomTabNavigator();
 const HomeTabs = () => {
   return (
     <Tab.Navigator
+   
       screenOptions={({ route }) => ({
+        animation: 'shift',
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
 
@@ -41,7 +43,7 @@ const HomeTabs = () => {
         },
         tabBarActiveTintColor: '#32CD32',
         tabBarInactiveTintColor: 'gray',
-        tabBarLabelStyle: { fontFamily: 'AlbertSans-Medium' }, // Apply the font here
+        tabBarLabelStyle: { fontFamily: 'AlbertSans-Medium',  animation: 'shift',  }, // Apply the font here
       })}
     >
       <Tab.Screen name="Home" component={Home} options={{ headerShown: false }} />
@@ -58,7 +60,7 @@ const App = () => {
       <Stack.Navigator
         initialRouteName="onboard"
         screenOptions={{
-          cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS, // Enables horizontal slide transitions
+          cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS, 
         }}
       >
         <Stack.Screen
@@ -98,13 +100,13 @@ const App = () => {
         />
         <Stack.Screen
           name="home"
-          component={HomeTabs} // Use Tab Navigator for Home
+          component={HomeTabs} 
           options={{ headerShown: false }}
         />
 
 <Stack.Screen
           name="settings"
-          component={SettingsScreen} // Use Tab Navigator for Home
+          component={SettingsScreen} 
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

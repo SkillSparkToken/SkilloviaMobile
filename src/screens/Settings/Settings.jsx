@@ -72,10 +72,10 @@ const styles = StyleSheet.create({
 },
 
 headerContainer: {
-    flexDirection: "row", // Align items horizontally
-    // alignItems: "center", // Vertically align items in the row
+    flexDirection: "row", 
+    
     paddingHorizontal: 16,
-    paddingVertical: 10, // Adjust padding as needed
+    paddingVertical: 10, 
 
   },
 header: {
@@ -107,7 +107,7 @@ sectionHeader: {
     marginRight: 12,
   },
   itemText: {
-    fontSize: 14,
+    fontSize: 15,
     color: "#374151",
     fontFamily: 'AlbertSans-Medium',
   },
