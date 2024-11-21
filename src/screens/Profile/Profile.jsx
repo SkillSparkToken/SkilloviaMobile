@@ -43,19 +43,20 @@ const Profile = ({navigation}) => {
        
         >
           <View style={styles.pocket}>
-            <Icon name="wallet-outline" size={20} color="#000" style={styles.pocketIcon} />
+           
             <View style={styles.pocketInfo}>
               <Text style={styles.pocketTitle}>Cash balance</Text>
               <Text style={styles.cash}>£3,000.00</Text>
             </View>
             <Icon name="lock-closed-outline" size={20} color="#000" />
           </View>
-          <View style={styles.pocket}>
-            <Icon name="cash-outline" size={20} color="#000" style={styles.pocketIcon} />
+          <View style={styles.pocket1}>
+           
             <View style={styles.pocketInfo}>
               <Text style={styles.pocketTitle}>Spare change</Text>
               <Text style={styles.cash}>£50.00</Text>
             </View>
+            <Icon name="lock-closed-outline" size={20} color="#000" />
           </View>
           {/* Add more pocket cards if needed */}
         </ScrollView>
@@ -159,12 +160,23 @@ const styles = StyleSheet.create({
     marginRight: 10,
     borderRadius: 10,
     padding: 20,
-    minWidth: 250,
+    minWidth: 280,
+
+  },
+
+  pocket1: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Color.card,
+    marginRight: 10,
+    borderRadius: 10,
+    padding: 20,
+    minWidth: 280,
 
   },
   pocketInfo: {
     flex: 1,
-    marginLeft: 10,
+    marginLeft: 1,
   },
   pocketIcon: {
     marginRight: 10,
@@ -180,7 +192,7 @@ const styles = StyleSheet.create({
   },
   cash: {
     fontSize: 20,
-    fontFamily: 'AlbertSans-Medium',
+    fontFamily: 'AlbertSans-ExtraBold',
     color: '#000',
     marginVertical: 10,
   },
