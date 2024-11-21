@@ -192,35 +192,12 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(10, 0, 0, 0.5)',
-    padding: 20,
+
+ 
   },
-  modalTitle: {
-    fontSize: 20,
-    fontFamily: 'AlbertSans-Bold',
-    color: '#FFFFFF',
-    marginBottom: 10,
-  },
-  modalDescription: {
-    fontSize: 14,
-    fontFamily: 'AlbertSans-Regular',
-    color: '#FFFFFF',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  closeButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 5,
-  },
-  closeButtonText: {
-    fontSize: 14,
-    fontFamily: 'AlbertSans-Medium',
-    color: '#000',
-  },
+  
+ 
+
 });
 
 export default Home;
