@@ -15,6 +15,8 @@ import Community from './src/screens/Community/Community';
 import Profile from './src/screens/Profile/Profile';
 import Booking from './src/screens/Booking/Booking';
 import SettingsScreen from './src/screens/Settings/Settings';
+import MySkillsScreen from './src/screens/Myskills/Skills';
+import AddSkillScreen from './src/screens/Myskills/AddSkill';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -107,6 +109,18 @@ const App = () => {
 <Stack.Screen
           name="settings"
           component={SettingsScreen} 
+          options={{ headerShown: false }}
+        />
+
+<Stack.Screen
+          name="myskill"
+          component={MySkillsScreen} 
+          options={{ headerShown: false }}
+        />
+
+<Stack.Screen
+          name="addskill"
+          component={AddSkillScreen} 
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
