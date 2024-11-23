@@ -21,6 +21,9 @@ import ExprienceLevel from './src/screens/Myskills/ExprienceLevel';
 import SkillDescription from './src/screens/Myskills/Description';
 import HourlyRate from './src/screens/Myskills/HourlyRate';
 import EditProfile from './src/screens/Profile/EditProfile';
+import NotificationSettings from './src/screens/Notification/Notification';
+import Apperance from './src/screens/Settings/Apperance';
+import SecurityScreen from './src/screens/Security/Security';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -152,6 +155,27 @@ const App = () => {
 <Stack.Screen
           name="editprofile"
           component={EditProfile} 
+          options={{ headerShown: false }}
+        />
+
+        {/* notification */}
+
+        <Stack.Screen
+          name="notification"
+          component={NotificationSettings} 
+          options={{ headerShown: false }}
+        />
+
+<Stack.Screen
+          name="appearance"
+          component={Apperance} 
+          options={{ headerShown: false }}
+        />
+
+
+<Stack.Screen
+          name="security"
+          component={SecurityScreen} 
           options={{ headerShown: false }}
         />
       </Stack.Navigator>
