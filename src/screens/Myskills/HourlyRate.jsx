@@ -69,7 +69,7 @@ const HourlyRate = ({ navigation }) => {
       {/* Done Button */}
       <TouchableOpacity
         style={[styles.doneButton, !hourlyRate && styles.disabledButton]}
-        onPress={() => hourlyRate && navigation.navigate('NextScreen', { hourlyRate: parseFloat(hourlyRate) })}
+        onPress={() => hourlyRate && navigation.navigate('myskill', { hourlyRate: parseFloat(hourlyRate) })}
         disabled={!hourlyRate}
       >
         <Text style={styles.doneButtonText}>Done</Text>

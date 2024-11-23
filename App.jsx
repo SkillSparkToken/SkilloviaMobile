@@ -20,6 +20,7 @@ import AddSkillScreen from './src/screens/Myskills/AddSkill';
 import ExprienceLevel from './src/screens/Myskills/ExprienceLevel';
 import SkillDescription from './src/screens/Myskills/Description';
 import HourlyRate from './src/screens/Myskills/HourlyRate';
+import EditProfile from './src/screens/Profile/EditProfile';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -143,6 +144,14 @@ const App = () => {
 <Stack.Screen
           name="rate"
           component={HourlyRate} 
+          options={{ headerShown: false }}
+        />
+
+        {/* profile */}
+
+<Stack.Screen
+          name="editprofile"
+          component={EditProfile} 
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

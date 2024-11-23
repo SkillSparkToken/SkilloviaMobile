@@ -144,11 +144,11 @@ const styles = StyleSheet.create({
     color: '#333333',
   },
   selectedSkillItem: {
-    borderColor: '#32CD32',
-    backgroundColor: '#E8FFE8',
+    // borderColor: '#32CD32',
+    // backgroundColor: '#E8FFE8',
   },
   selectedSkillText: {
-    color: '#32CD32',
+    // color: '#32CD32',
     fontFamily: 'AlbertSans-Bold',
   },
   nextButton: {

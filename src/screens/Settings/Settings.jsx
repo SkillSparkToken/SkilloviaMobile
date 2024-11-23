@@ -9,7 +9,7 @@ const SettingsScreen = ({ navigation }) => {
       title: "My Skillovia",
       data: [
         { title: "My skills", icon: "book", route: "myskill" },
-        { title: "Edit profile", icon: "person", route: "EditProfile" },
+        { title: "Edit profile", icon: "person", route: "editprofile" },
         { title: "KYC", icon: "id-card", route: "KYC" },
         { title: "Invite friends", icon: "share-social", route: "InviteFriends" },
       ],
