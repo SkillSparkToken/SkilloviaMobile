@@ -17,6 +17,9 @@ import Booking from './src/screens/Booking/Booking';
 import SettingsScreen from './src/screens/Settings/Settings';
 import MySkillsScreen from './src/screens/Myskills/Skills';
 import AddSkillScreen from './src/screens/Myskills/AddSkill';
+import ExprienceLevel from './src/screens/Myskills/ExprienceLevel';
+import SkillDescription from './src/screens/Myskills/Description';
+import HourlyRate from './src/screens/Myskills/HourlyRate';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -121,6 +124,25 @@ const App = () => {
 <Stack.Screen
           name="addskill"
           component={AddSkillScreen} 
+          options={{ headerShown: false }}
+        />
+
+
+<Stack.Screen
+          name="exprience"
+          component={ExprienceLevel} 
+          options={{ headerShown: false }}
+        />
+
+<Stack.Screen
+          name="description"
+          component={SkillDescription} 
+          options={{ headerShown: false }}
+        />
+
+<Stack.Screen
+          name="rate"
+          component={HourlyRate} 
           options={{ headerShown: false }}
         />
       </Stack.Navigator>

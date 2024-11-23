@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, StatusBar } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { Color } from '../../Utils/Theme';
 
 const AddSkillScreen = ({ navigation }) => {
@@ -69,8 +70,8 @@ const AddSkillScreen = ({ navigation }) => {
               {item}
             </Text>
             {/* Circle Icon */}
-            <Ionicons
-              name={selectedSkill === item ? 'checkmark-circle' : 'ellipse-outline'}
+            <FontAwesome
+              name={selectedSkill === item ? 'dot-circle-o' : 'circle-o'}
               size={20}
               color={selectedSkill === item ? '#32CD32' : '#B0B0B0'}
             />
@@ -83,7 +84,7 @@ const AddSkillScreen = ({ navigation }) => {
         style={[styles.nextButton, !selectedSkill && styles.disabledButton]}
         onPress={() =>
           selectedSkill &&
-          navigation.navigate('NextScreen', { skill: selectedSkill })
+          navigation.navigate('exprience', { skill: selectedSkill })
         }
         disabled={!selectedSkill}
       >
