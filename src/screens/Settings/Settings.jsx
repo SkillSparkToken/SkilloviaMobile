@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 import React from "react";
 import { View, Text, SectionList, StyleSheet, TouchableOpacity, StatusBar } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons"; 
@@ -17,11 +18,11 @@ const SettingsScreen = ({ navigation }) => {
     {
       title: "General",
       data: [
-        { title: "Security", icon: "shield-checkmark", route: "Security" },
+        { title: "Security", icon: "shield-checkmark", route: "security1" },
         { title: "Payment settings", icon: "card", route: "PaymentSettings" },
-        { title: "Notifications settings", icon: "notifications", route: "NotificationSettings" },
+        { title: "Notifications settings", icon: "notifications", route: "notification" },
         { title: "Linked Devices", icon: "laptop", route: "LinkedDevices" },
-        { title: "Appearance", icon: "color-palette", route: "Appearance" },
+        { title: "Appearance", icon: "color-palette", route: "appearance" },
       ],
     },
     {
