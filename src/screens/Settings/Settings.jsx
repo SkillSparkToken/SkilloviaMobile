@@ -9,16 +9,16 @@ const SettingsScreen = ({ navigation }) => {
     {
       title: "My Skillovia",
       data: [
-        { title: "My skills", icon: "book", route: "myskill" },
+        { title: "My skills", icon: "book", route: "empty" },
         { title: "Edit profile", icon: "person", route: "editprofile" },
-        { title: "KYC", icon: "id-card", route: "KYC" },
+        { title: "KYC", icon: "id-card", route: "kyclist" },
         { title: "Invite friends", icon: "share-social", route: "InviteFriends" },
       ],
     },
     {
       title: "General",
       data: [
-        { title: "Security", icon: "shield-checkmark", route: "security1" },
+        { title: "Security", icon: "shield-checkmark", route: "security" },
         { title: "Payment settings", icon: "card", route: "PaymentSettings" },
         { title: "Notifications settings", icon: "notifications", route: "notification" },
         { title: "Linked Devices", icon: "laptop", route: "LinkedDevices" },
