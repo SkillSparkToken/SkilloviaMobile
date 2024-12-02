@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons'; // For the back arrow icon
+import Icon from 'react-native-vector-icons/MaterialIcons'; 
+import { Color } from '../../Utils/Theme';
 
 const LoginScreen = ({ navigation }) => {
   return (
@@ -62,7 +63,7 @@ const LoginScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAF4', // Light background color
+    backgroundColor: Color.background,
     paddingHorizontal: 20,
     paddingTop: 50,
   },
@@ -95,12 +96,12 @@ const styles = StyleSheet.create({
   forgotPassword: {
     fontSize: 14,
     fontFamily: 'AlbertSans-Medium',
-    color: '#1877F2',
-    textAlign: 'right',
+    color: Color.secondary,
+  
     marginBottom: 30,
   },
   loginButton: {
-    backgroundColor: '#32CD32',
+    backgroundColor: Color.primary,
     borderRadius: 8,
     paddingVertical: 15,
     alignItems: 'center',
@@ -109,7 +110,7 @@ const styles = StyleSheet.create({
   loginButtonText: {
     fontSize: 16,
     fontFamily: 'AlbertSans-Bold',
-    color: '#fff',
+    color: Color.secondary,
   },
   footerText: {
     fontSize: 14,
@@ -120,7 +121,7 @@ const styles = StyleSheet.create({
   },
   signupText: {
     fontFamily: 'AlbertSans-Bold',
-    color: '#1877F2',
+    color: Color.secondary,
   },
   termsText: {
     fontSize: 12,
@@ -130,7 +131,7 @@ const styles = StyleSheet.create({
   },
   linkText: {
     fontFamily: 'AlbertSans-Bold',
-    color: '#1877F2',
+    color: Color.secondary,
   },
 });
 

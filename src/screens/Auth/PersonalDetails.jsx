@@ -8,6 +8,7 @@ import {
   StatusBar,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons'; // Back arrow icon
+import { Color } from '../../Utils/Theme';
 const PersonalDetails = ({ navigation }) => {
   return (
     <View style={styles.container}>
@@ -41,7 +42,7 @@ const PersonalDetails = ({ navigation }) => {
         <TextInput style={styles.input} placeholder="Select gender" />
         <TextInput style={styles.input} placeholder="Enter your password" secureTextEntry />
 
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity onPress={() => navigation.navigate('welcome')} style={styles.button}>
           <Text style={styles.buttonText}>Create account</Text>
         </TouchableOpacity>
 
@@ -65,7 +66,7 @@ const PersonalDetails = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F8F8',
+    backgroundColor: Color.background,
     paddingHorizontal: 20,
     
   },
@@ -102,7 +103,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 15,
     marginBottom: 15,
-    backgroundColor: '#FFF',
+    // backgroundColor: '#FFF',
     width: '100%',
     fontFamily: 'AlbertSans-Medium',
   },
@@ -111,16 +112,16 @@ const styles = StyleSheet.create({
     fontFamily: 'AlbertSans-Medium',
   },
   button: {
-    backgroundColor: '#32CD32',
+    backgroundColor: Color.primary,
     borderRadius: 25,
     paddingVertical: 15,
     alignItems: 'center',
     marginBottom: 20,
   },
   buttonText: {
-    color: '#FFF',
+    color: Color.secondary,
     fontSize: 16,
-    fontFamily: 'AlbertSans-Medium',
+    fontFamily: 'AlbertSans-Bold',
   },
   loginText: {
     fontSize: 14,

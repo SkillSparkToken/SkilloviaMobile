@@ -8,6 +8,8 @@ import {
   StatusBar,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { Color } from '../Utils/Theme';
+import Google from '../../assets/Icons/svgs/google';
 
 const Onboarding = ({ navigation }) => {
   return (
@@ -32,7 +34,8 @@ const Onboarding = ({ navigation }) => {
           </TouchableOpacity>
 
           <TouchableOpacity style={[styles.socialButton, styles.google]}>
-            <Icon name="google" size={20} color="#DB4437" style={styles.icon} />
+            <Google />
+            {/* <Icon name="google" size={20} color="#DB4437" style={styles.icon} /> */}
             <Text style={[styles.socialText, styles.googleText]}>Continue with Google</Text>
           </TouchableOpacity>
 
@@ -125,7 +128,7 @@ const styles = StyleSheet.create({
     fontFamily: 'AlbertSans-Medium',
   },
   googleText: {
-    color: '#DB4437',
+    color: Color.text,
   },
   icon: {
     marginRight: 10,
@@ -140,7 +143,7 @@ const styles = StyleSheet.create({
     fontFamily: 'AlbertSans-Light',
   },
   createAccountButton: {
-    backgroundColor: '#32CD32',
+    backgroundColor: Color.primary,
     width: '100%',
     paddingVertical: 15,
     borderRadius: 25,
@@ -150,7 +153,7 @@ const styles = StyleSheet.create({
   },
   createAccountText: {
     fontSize: 16,
-    color: '#fff',
+    color: Color.secondary,
     
     fontFamily: 'AlbertSans-Bold',
   },
