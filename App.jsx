@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unstable-nested-components */
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
@@ -24,7 +25,12 @@ import EditProfile from './src/screens/Profile/EditProfile';
 import NotificationSettings from './src/screens/Notification/Notification';
 import Apperance from './src/screens/Settings/Apperance';
 import SecurityScreen from './src/screens/Security/Security';
-
+import HomeIcon from './assets/Icons/explore.svg';
+import KYCList from './src/screens/Kyc/KycList';
+import IDscreen from './src/screens/Kyc/IDscreen';
+import ChangePasswordScreen from './src/screens/Security/ChangPassword';
+import SkillDetailsScreen from './src/screens/Myskills/SkillDetails';
+import EmptySkillsScreen from './src/screens/Myskills/EmptySKill';
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -52,12 +58,16 @@ const HomeTabs = () => {
         },
         tabBarActiveTintColor: '#32CD32',
         tabBarInactiveTintColor: 'gray',
-        tabBarLabelStyle: { fontFamily: 'AlbertSans-Medium',  animation: 'shift',  }, // Apply the font here
+        tabBarLabelStyle: { fontFamily: 'AlbertSans-Medium',  animation: 'shift',  },
+        tabBarStyle: {
+          backgroundColor: '#F0F6E6', // Background color of the tab bar
+         
+        },
       })}
     >
       <Tab.Screen name="Home" component={Home} options={{ headerShown: false }} />
-      <Tab.Screen name="Booking" component={Booking} options={{ headerShown: false }} />
       <Tab.Screen name="Community" component={Community} options={{ headerShown: false }} />
+      <Tab.Screen name="Booking" component={Booking} options={{ headerShown: false }} />
       <Tab.Screen name="Profile" component={Profile} options={{ headerShown: false }} />
     </Tab.Navigator>
   );
@@ -178,6 +188,38 @@ const App = () => {
           component={SecurityScreen} 
           options={{ headerShown: false }}
         />
+
+<Stack.Screen
+          name="kyclist"
+          component={KYCList} 
+          options={{ headerShown: false }}
+        />
+
+<Stack.Screen
+          name="id"
+          component={IDscreen} 
+          options={{ headerShown: false }}
+        />
+<Stack.Screen
+          name="editpsw"
+          component={ChangePasswordScreen} 
+          options={{ headerShown: false }}
+        />
+
+
+<Stack.Screen
+          name="skilldetails"
+          component={SkillDetailsScreen} 
+          options={{ headerShown: false }}
+        />
+
+
+<Stack.Screen
+          name="empty"
+          component={EmptySkillsScreen} 
+          options={{ headerShown: false }}
+        />
+        
       </Stack.Navigator>
     </NavigationContainer>
   );

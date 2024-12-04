@@ -1,72 +1,120 @@
-// src/screens/ChangePasswordScreen.js
 import React, { useState } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
-  TouchableOpacity,
   TextInput,
-  Platform,
+  TouchableOpacity,
+  StyleSheet,
+  StatusBar,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/Feather';
+import { getStatusBarHeight } from 'react-native-status-bar-height';
+import { Color } from '../../Utils/Theme';
 
-const ChangePasswordScreen = () => {
-  const navigation = useNavigation();
+const ChangePasswordScreen = ({ navigation }) => {
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [isOldPasswordVisible, setIsOldPasswordVisible] = useState(false);
+  const [isNewPasswordVisible, setIsNewPasswordVisible] = useState(false);
+  const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
 
   const handleSave = () => {
-    // Add password validation and update logic here
+    // Add validation and API calls here
+    alert('Password updated successfully!');
     navigation.goBack();
   };
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
-          <Text style={styles.backText}>←</Text>
+      {/* Status Bar */}
+      <StatusBar barStyle="dark-content" backgroundColor="#F4F6EC" />
+
+      {/* Header */}
+      <View style={[styles.header, { marginTop: getStatusBarHeight() }]}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Icon name="arrow-left" size={24} color="#333" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Change password</Text>
+        <View style={{ width: 24 }} /> {/* Placeholder for alignment */}
       </View>
 
-      <View style={styles.content}>
-        <View style={styles.inputContainer}>
+      {/* Input Form */}
+      <View style={styles.form}>
+        {/* Old Password */}
+        <View style={styles.inputGroup}>
           <Text style={styles.label}>Old Password</Text>
-          <TextInput
-            style={styles.input}
-            secureTextEntry
-            value={oldPassword}
-            onChangeText={setOldPassword}
-            placeholder="Enter old password"
-          />
+          <View style={styles.inputWrapper}>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter old password"
+              placeholderTextColor="#aaa"
+              secureTextEntry={!isOldPasswordVisible}
+              value={oldPassword}
+              onChangeText={setOldPassword}
+            />
+            <TouchableOpacity
+              onPress={() => setIsOldPasswordVisible(!isOldPasswordVisible)}>
+              <Icon
+                name={isOldPasswordVisible ? 'eye' : 'eye-off'}
+                size={20}
+                color="#666"
+              />
+            </TouchableOpacity>
+          </View>
         </View>
 
-        <View style={styles.inputContainer}>
+        {/* New Password */}
+        <View style={styles.inputGroup}>
           <Text style={styles.label}>New Password</Text>
-          <TextInput
-            style={styles.input}
-            secureTextEntry
-            value={newPassword}
-            onChangeText={setNewPassword}
-            placeholder="Enter new password"
-          />
+          <View style={styles.inputWrapper}>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter new password"
+              placeholderTextColor="#aaa"
+              secureTextEntry={!isNewPasswordVisible}
+              value={newPassword}
+              onChangeText={setNewPassword}
+            />
+            <TouchableOpacity
+              onPress={() => setIsNewPasswordVisible(!isNewPasswordVisible)}>
+              <Icon
+                name={isNewPasswordVisible ? 'eye' : 'eye-off'}
+                size={20}
+                color="#666"
+              />
+            </TouchableOpacity>
+          </View>
         </View>
 
-        <View style={styles.inputContainer}>
+        {/* Confirm New Password */}
+        <View style={styles.inputGroup}>
           <Text style={styles.label}>Confirm New Password</Text>
-          <TextInput
-            style={styles.input}
-            secureTextEntry
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            placeholder="Confirm new password"
-          />
+          <View style={styles.inputWrapper}>
+            <TextInput
+              style={styles.input}
+              placeholder="Confirm new password"
+              placeholderTextColor="#aaa"
+              secureTextEntry={!isConfirmPasswordVisible}
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+            />
+            <TouchableOpacity
+              onPress={() =>
+                setIsConfirmPasswordVisible(!isConfirmPasswordVisible)
+              }>
+              <Icon
+                name={isConfirmPasswordVisible ? 'eye' : 'eye-off'}
+                size={20}
+                color="#666"
+              />
+            </TouchableOpacity>
+          </View>
         </View>
+      </View>
 
+      {/* Save Button */}
+      <View style={styles.saveButtonContainer}>
         <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
           <Text style={styles.saveButtonText}>Save changes</Text>
         </TouchableOpacity>
@@ -78,57 +126,67 @@ const ChangePasswordScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: Color.background,
+    paddingHorizontal: 16,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-    paddingTop: Platform.OS === 'ios' ? 50 : 16,
-  },
-  backButton: {
-    padding: 8,
-  },
-  backText: {
-    fontSize: 24,
-    color: '#000',
+    marginBottom: 20,
+    paddingTop: 20,
+
   },
   headerTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    marginLeft: 16,
+    fontSize: 18,
+    fontFamily: 'AlbertSans-Medium',
+    color: '#333',
+    marginLeft: 9,
+   
   },
-  content: {
-    padding: 16,
+  form: {
+    flex: 1,
+    marginTop: 20,
   },
-  inputContainer: {
+  inputGroup: {
     marginBottom: 20,
   },
   label: {
-    fontSize: 16,
+    fontSize: 14,
+    fontFamily: 'AlbertSans-Medium',
     color: '#333',
     marginBottom: 8,
   },
-  input: {
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 8,
-    padding: 12,
+    paddingHorizontal: 12,
+    backgroundColor:Color.gray
+  },
+  input: {
+    flex: 1,
     fontSize: 16,
+    fontFamily: 'AlbertSans-Light',
+    color: '#333',
+    paddingVertical: 12,
+  },
+  saveButtonContainer: {
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    backgroundColor: '#F4F6EC',
   },
   saveButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: Color.primary,
     padding: 16,
-    borderRadius: 8,
+    borderRadius: 30,
     alignItems: 'center',
-    marginTop: 32,
   },
   saveButtonText: {
-    color: '#fff',
     fontSize: 16,
-    fontWeight: '600',
+    fontFamily: 'AlbertSans-Medium',
+    color: Color.secondary,
   },
 });
 

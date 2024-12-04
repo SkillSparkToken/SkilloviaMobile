@@ -29,9 +29,9 @@ const Home = () => {
   };
 
   const services = [
-    { id: '1', title: 'DIY', image: 'https://via.placeholder.com/150' },
-    { id: '2', title: 'Baby sitting', image: 'https://via.placeholder.com/150' },
-    { id: '3', title: 'Arts & Crafts', image: 'https://via.placeholder.com/150' },
+    { id: '1', title: 'DIY', image: 'https://res.cloudinary.com/dmhvsyzch/image/upload/v1732441112/Image_1_byedwn.png' },
+    { id: '2', title: 'Baby sitting', image: 'https://res.cloudinary.com/dmhvsyzch/image/upload/v1732441115/Image_sfljtt.png' },
+    { id: '3', title: 'Arts & Crafts', image: 'https://res.cloudinary.com/dmhvsyzch/image/upload/v1732441108/Image_2_dnlbzw.png' },
   ];
 
   const renderService = ({ item }) => (
@@ -171,25 +171,31 @@ const styles = StyleSheet.create({
     color: '#000',
     marginVertical: 15,
   },
+ 
+
+
   serviceList: {
-    paddingVertical: 10,
+    // paddingVertical: 10,
   },
   serviceCard: {
     marginRight: 10,
-    width: 100,
+    width: 140, // Increased width
     alignItems: 'center',
   },
   serviceImage: {
-    width: 80,
-    height: 80,
+    width: 135, // Increased width
+    height: 130, // Increased height
     borderRadius: 10,
     marginBottom: 5,
   },
   serviceTitle: {
-    fontSize: 14,
+    fontSize: 16, // Slightly larger font size
     fontFamily: 'AlbertSans-Regular',
     color: '#000',
+    textAlign:"left"
   },
+
+ 
   modalContainer: {
     flex: 1,
 

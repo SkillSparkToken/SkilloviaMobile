@@ -1,163 +1,123 @@
-// src/screens/SecurityScreen.js
 import React, { useState } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   TouchableOpacity,
+  StyleSheet,
   Switch,
-  Platform,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { Color } from '../../Utils/Theme';
 
-const SecurityScreen = () => {
-  const navigation = useNavigation();
-  const [isBiometricEnabled, setBiometricEnabled] = useState(true);
+const SecurityScreen = ({navigation}) => {
+  const [faceRecognitionEnabled, setFaceRecognitionEnabled] = useState(true);
+
+  const toggleFaceRecognition = () => {
+    setFaceRecognitionEnabled((prevState) => !prevState);
+  };
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
-          <Text style={styles.backText}>←</Text>
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Security</Text>
-      </View>
+      {/* Header */}
+      <TouchableOpacity style={styles.header} onPress={() => navigation.goBack()}>
+        <Icon name="arrow-back-outline" size={24} color="#000" />
+        <Text style={styles.headerText}>Security</Text>
+      </TouchableOpacity>
 
-      <View style={styles.content}>
-        <Text style={styles.sectionTitle}>Authentication options</Text>
+      {/* Authentication Options Section */}
+      <Text style={styles.sectionTitle}>Authentication options</Text>
 
-        <View style={styles.optionContainer}>
-          <TouchableOpacity
-            style={styles.option}
-            onPress={() => navigation.navigate('ChangePassword')}
-          >
-            <View>
-              <Text style={styles.optionTitle}>Password</Text>
-              <View style={styles.optionStatus}>
-                <Text style={styles.statusText}>Password has been set</Text>
-                <Text style={styles.hintText}>
-                  You change your password to a more stronger one
-                </Text>
-              </View>
-            </View>
-            <Text style={styles.editIcon}>✎</Text>
-          </TouchableOpacity>
-
-          <View style={[styles.option, styles.lastOption]}>
-            <View>
-              <Text style={styles.optionTitle}>
-                Face or fingerprint recognition
-              </Text>
-              <View style={styles.optionStatus}>
-                <Text style={styles.statusText}>
-                  {isBiometricEnabled ? 'Enabled' : 'Disabled'}
-                </Text>
-                <Text style={styles.hintText}>
-                  Use your face or fingerprint when logging in.
-                </Text>
-              </View>
-            </View>
-            <Switch
-              value={isBiometricEnabled}
-              onValueChange={setBiometricEnabled}
-              trackColor={{ false: '#767577', true: '#81b0ff' }}
-              thumbColor={isBiometricEnabled ? '#f5dd4b' : '#f4f3f4'}
-              ios_backgroundColor="#3e3e3e"
-            />
+      {/* Password Option */}
+      <View style={styles.option}>
+        <View style={styles.optionLeft}>
+          <Icon name="checkmark-circle" size={20} color="#32CD32" />
+          <View style={styles.optionTextContainer}>
+            <Text style={styles.optionTitle}>Password has been set</Text>
+            <Text style={styles.optionSubtitle}>
+              You change your password to a more stronger one
+            </Text>
           </View>
         </View>
+        <TouchableOpacity onPress={() => navigation.navigate('editpsw')}>
+          <Icon name="create-outline" size={20} color="#000" />
+        </TouchableOpacity>
+      </View>
+
+      {/* Face or Fingerprint Recognition Option */}
+      <View style={styles.option}>
+        <View style={styles.optionLeft}>
+          <Icon name="checkmark-circle" size={20} color="#32CD32" />
+          <View style={styles.optionTextContainer}>
+            <Text style={styles.optionTitle}>Face or fingerprint recognition</Text>
+            <Text style={styles.optionTitle}>Enabled</Text>
+            <Text style={styles.optionSubtitle}>
+              Use your face or fingerprint when logging in.
+            </Text>
+          </View>
+        </View>
+        <Switch
+          value={faceRecognitionEnabled}
+          onValueChange={toggleFaceRecognition}
+          trackColor={{ false: '#DDD', true: '#32CD32' }}
+          thumbColor="#FFF"
+        />
       </View>
     </View>
   );
 };
 
+export default SecurityScreen;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: Color.background,
+    padding: 20,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-    paddingTop: Platform.OS === 'ios' ? 50 : 16,
+    marginBottom: 30,
+    marginTop: 20,
   },
-  backButton: {
-    padding: 8,
-  },
-  backText: {
-    fontSize: 24,
-    color: '#000',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    marginLeft: 16,
-  },
-  content: {
-    padding: 16,
+  headerText: {
+    fontSize: 18,
+    fontFamily: 'AlbertSans-Bold',
+    marginLeft: 10,
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#666',
-    marginBottom: 16,
-  },
-  optionContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 2,
-      },
-    }),
+    color: '#555',
+    fontFamily: 'AlbertSans-Bold',
+    marginBottom: 20,
   },
   option: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
+    paddingVertical: 25,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: '#EEE',
+ 
+    marginVertical:10,
+  
   },
-  lastOption: {
-    borderBottomWidth: 0,
+  optionLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  optionTextContainer: {
+    marginLeft: 10,
   },
   optionTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    marginBottom: 4,
-  },
-  optionStatus: {
-    marginTop: 4,
-  },
-  statusText: {
-    color: '#4CAF50',
     fontSize: 14,
+    color: '#000',
+    fontFamily: 'AlbertSans-Medium',
+    paddingBottom:4
   },
-  hintText: {
-    color: '#666',
-    fontSize: 14,
-    marginTop: 2,
-  },
-  editIcon: {
-    fontSize: 20,
-    color: '#666',
+  optionSubtitle: {
+    fontSize: 12,
+    color: '#555',
+    fontFamily: 'AlbertSans-Medium',
   },
 });
-
-export default SecurityScreen;
-
-
-

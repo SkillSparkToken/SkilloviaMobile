@@ -36,7 +36,7 @@ const MySkillsScreen = ({ navigation }) => {
     <View style={styles.card}>
       <View style={styles.cardHeader}>
         <Text style={styles.skillTitle}>{item.title}</Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={()=>navigation.navigate("skilldetails")}>
           <Icon name="edit" size={20} color="#4F4F4F" />
         </TouchableOpacity>
       </View>
