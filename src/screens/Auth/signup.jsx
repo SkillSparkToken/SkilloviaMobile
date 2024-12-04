@@ -1,9 +1,45 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons'; 
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import apiClient from '../../Hooks/Api'; // Import apiClient for API calls
 import { Color } from '../../Utils/Theme';
 
 const CreateAccountScreen = ({ navigation }) => {
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [loading, setLoading] = useState(false); // Loading state
+
+  const handleVerify = async () => {
+    if (!phoneNumber) {
+      Alert.alert('Error', 'Please enter a phone number');
+      return;
+    }
+  
+    setLoading(true); // Start loading
+  
+    try {
+      const response = await apiClient.post('/api/auth/sendverificationcode', {
+        phone: phoneNumber,
+      });
+  
+      if (response.data.status === 'success') {
+        // Navigate to OTP screen with the phone number
+        navigation.navigate('otp', { phoneNumber });
+      } else {
+        const message = response.data.message || 'Failed to send verification code';
+        Alert.alert('Error', message);
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        const message = error.response.data.message || 'Invalid request. Please check the phone number.';
+        Alert.alert('Validation Error', message);
+      } else {
+        Alert.alert('Error', 'Something went wrong. Please try again');
+      }
+    } finally {
+      setLoading(false); // End loading
+    }
+  };
+  
   return (
     <View style={styles.container}>
       {/* Back Button */}
@@ -21,13 +57,23 @@ const CreateAccountScreen = ({ navigation }) => {
       <TextInput
         style={styles.input}
         placeholder="Enter phone number"
-        placeholderTextColor="#999"
+        placeholderTextColor={styles.placeholder.color} 
         keyboardType="phone-pad"
+        value={phoneNumber}
+        onChangeText={(text) => setPhoneNumber(text)}
       />
 
       {/* Verify Button */}
-      <TouchableOpacity  onPress={() => navigation.navigate('otp')} style={styles.verifyButton}>
-        <Text style={styles.verifyButtonText}>Verify</Text>
+      <TouchableOpacity
+        onPress={handleVerify}
+        style={[styles.verifyButton, loading && styles.verifyButtonDisabled]}
+        disabled={loading}
+      >
+        {loading ? (
+          <ActivityIndicator size="small" color="#fff" /> // Loading spinner
+        ) : (
+          <Text style={styles.verifyButtonText}>Verify</Text>
+        )}
       </TouchableOpacity>
 
       {/* Already have an account */}
@@ -51,7 +97,7 @@ const CreateAccountScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Color.background, // Light background color
+    backgroundColor: Color.background,
     paddingHorizontal: 20,
     paddingTop: 50,
   },
@@ -63,7 +109,6 @@ const styles = StyleSheet.create({
     fontFamily: 'AlbertSans-Medium',
     color: '#000',
     marginBottom: 20,
-    
   },
   label: {
     fontSize: 14,
@@ -82,17 +127,24 @@ const styles = StyleSheet.create({
     color: '#000',
     marginBottom: 30,
   },
+  placeholder: {
+    color: '#999', 
+    fontFamily: 'AlbertSans-Medium',// Custom placeholder color
+  },
   verifyButton: {
-    backgroundColor: Color.primary, // Light green
+    backgroundColor: Color.primary,
     borderRadius: 8,
     paddingVertical: 15,
     alignItems: 'center',
     marginBottom: 30,
   },
+  verifyButtonDisabled: {
+    backgroundColor: '#A9A9A9', // Disabled button color
+  },
   verifyButtonText: {
     fontSize: 16,
     fontFamily: 'AlbertSans-Bold',
-    color: Color.secondary,
+    color: '#fff',
   },
   loginContainer: {
     flexDirection: 'row',
@@ -116,7 +168,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   link: {
-    color: '#32CD32', // Light green for links
+    color: '#32CD32',
   },
 });
 

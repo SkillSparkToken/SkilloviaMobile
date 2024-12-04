@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -6,46 +6,130 @@ import {
   TouchableOpacity,
   StyleSheet,
   StatusBar,
+  ActivityIndicator,
+  Alert
 } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons'; // Back arrow icon
+import Icon from 'react-native-vector-icons/MaterialIcons'; 
+import apiClient from '../../Hooks/Api';
 import { Color } from '../../Utils/Theme';
 
-const CreateAccount = ({ navigation }) => {
-  const [countdown, setCountdown] = useState(10);
+const OtpScreen = ({ route, navigation }) => {
+  const { phoneNumber } = route.params; 
+  const [otp, setOtp] = useState(['', '', '', '']); 
+  const [loading, setLoading] = useState(false);
+  const [countdown, setCountdown] = useState(30); 
+  const [timerActive, setTimerActive] = useState(false);
+  const inputRefs = useRef([]);
+
+  // Handle OTP input change and focus on next input
+  const handleOtpChange = (text, index) => {
+    const newOtp = [...otp];
+    newOtp[index] = text;
+    setOtp(newOtp);
+
+    if (text && index < otp.length - 1) {
+      inputRefs.current[index + 1].focus(); 
+    }
+  };
+
+  // OTP verification
+  const handleOtpVerification = async () => {
+    const otpCode = otp.join('');
+    if (!otpCode || otpCode.length < 4) {
+      Alert.alert('Error', 'Please enter the full OTP');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await apiClient.post('/api/auth/verifyphone', {
+        phone: phoneNumber,
+        code: otpCode,
+      });
+
+      if (response.data.status === 'success') {
+        navigation.navigate('personal'); 
+      } else {
+        Alert.alert('Error', response.data.message || 'OTP verification failed');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Something went wrong. Please try again');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Resend OTP functionality and countdown timer
+  const handleResendOtp = () => {
+    setCountdown(30); 
+    setTimerActive(true);
+  
+  };
+
+  useEffect(() => {
+    if (timerActive && countdown > 0) {
+      const timer = setInterval(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+
+      return () => clearInterval(timer);
+    } else if (countdown === 0) {
+      setTimerActive(false); 
+    }
+  }, [countdown, timerActive]);
 
   return (
     <View style={styles.container}>
-            <StatusBar
-  translucent={true} 
-  backgroundColor="transparent" 
-  barStyle="dark-content" 
-  hidden={false} 
-/>
+      <StatusBar
+        translucent={true}
+        backgroundColor="transparent"
+        barStyle="dark-content"
+        hidden={false}
+      />
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
         <Icon name="arrow-back" size={24} color="#000" />
       </TouchableOpacity>
 
-
       <View style={styles.content}>
         <Text style={styles.title}>Create account</Text>
         <Text style={styles.subtitle}>Input OTP verification</Text>
+        <Text style={styles.subtitle}>A code was sent to {phoneNumber}</Text>
 
         <View style={styles.otpContainer}>
-          {Array(4).fill().map((_, index) => (
+          {otp.map((value, index) => (
             <TextInput
               key={index}
+              ref={(ref) => (inputRefs.current[index] = ref)}
               style={styles.otpInput}
               maxLength={1}
               keyboardType="numeric"
+              value={value}
+              onChangeText={(text) => handleOtpChange(text, index)}
             />
           ))}
         </View>
 
-        <TouchableOpacity onPress={() => navigation.navigate('personal')} style={styles.button}>
-          <Text style={styles.buttonText}>Verify OTP</Text>
+        <TouchableOpacity
+          onPress={handleOtpVerification}
+          style={[styles.verifyButton, loading && styles.verifyButtonDisabled]}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text style={styles.verifyButtonText}>Verify OTP</Text>
+          )}
         </TouchableOpacity>
 
-        <Text style={styles.resendText}>Resend OTP in {countdown}s</Text>
+        <Text style={styles.resendText}>
+          Resend OTP in {countdown}s
+        </Text>
+        {!timerActive && (
+          <TouchableOpacity onPress={handleResendOtp} style={styles.resendButton}>
+            <Text>Resend OTP</Text>
+          </TouchableOpacity>
+        )}
+
         <Text style={styles.loginText}>
           Already have an account?{' '}
           <Text style={styles.link} onPress={() => navigation.navigate('login')}>
@@ -71,10 +155,6 @@ const styles = StyleSheet.create({
   },
   backButton: {
     marginTop: 50,
-  },
-  backText: {
-    fontSize: 16,
-    color: '#000',
   },
   content: {
     marginTop: 40,
@@ -104,19 +184,21 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 18,
     borderRadius: 10,
-  
   },
-  button: {
+  verifyButton: {
     backgroundColor: Color.primary,
     borderRadius: 25,
     paddingVertical: 15,
     alignItems: 'center',
     marginBottom: 10,
   },
-  buttonText: {
-    color: Color.secondary,
+  verifyButtonText: {
+    color: '#fff',
     fontSize: 16,
     fontFamily: 'AlbertSans-Bold',
+  },
+  verifyButtonDisabled: {
+    backgroundColor: '#ccc',
   },
   resendText: {
     fontSize: 14,
@@ -124,9 +206,16 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     fontFamily: 'AlbertSans-Medium',
   },
+  resendButton: {
+    padding: 10,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   loginText: {
     fontSize: 14,
-        color: Color.secondary,
+    color: Color.secondary,
     marginBottom: 20,
     fontFamily: 'AlbertSans-Medium',
   },
@@ -138,9 +227,8 @@ const styles = StyleSheet.create({
   termsText: {
     fontSize: 12,
     color: '#666',
-   
     fontFamily: 'AlbertSans-Medium',
   },
 });
 
-export default CreateAccount;
+export default OtpScreen;
