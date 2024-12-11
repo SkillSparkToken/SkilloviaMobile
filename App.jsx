@@ -31,6 +31,8 @@ import IDscreen from './src/screens/Kyc/IDscreen';
 import ChangePasswordScreen from './src/screens/Security/ChangPassword';
 import SkillDetailsScreen from './src/screens/Myskills/SkillDetails';
 import EmptySkillsScreen from './src/screens/Myskills/EmptySKill';
+import PeopleNearProfile from './src/screens/PeopleNearby/PeopleNeearProfile';
+import Explore from './src/screens/Explore/Explore';
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -217,6 +219,19 @@ const App = () => {
 <Stack.Screen
           name="empty"
           component={EmptySkillsScreen} 
+          options={{ headerShown: false }}
+        />
+
+
+<Stack.Screen
+          name="peopleProfile"
+          component={PeopleNearProfile} 
+          options={{ headerShown: false }}
+        />
+
+<Stack.Screen
+          name="explore"
+          component={Explore} 
           options={{ headerShown: false }}
         />
         

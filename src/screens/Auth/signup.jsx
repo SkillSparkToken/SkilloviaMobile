@@ -6,7 +6,8 @@ import { Color } from '../../Utils/Theme';
 
 const CreateAccountScreen = ({ navigation }) => {
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [loading, setLoading] = useState(false); // Loading state
+  const [loading, setLoading] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
 
   const handleVerify = async () => {
     if (!phoneNumber) {
@@ -14,7 +15,7 @@ const CreateAccountScreen = ({ navigation }) => {
       return;
     }
   
-    setLoading(true); // Start loading
+    setLoading(true);
   
     try {
       const response = await apiClient.post('/api/auth/sendverificationcode', {
@@ -22,7 +23,6 @@ const CreateAccountScreen = ({ navigation }) => {
       });
   
       if (response.data.status === 'success') {
-        // Navigate to OTP screen with the phone number
         navigation.navigate('otp', { phoneNumber });
       } else {
         const message = response.data.message || 'Failed to send verification code';
@@ -36,47 +36,45 @@ const CreateAccountScreen = ({ navigation }) => {
         Alert.alert('Error', 'Something went wrong. Please try again');
       }
     } finally {
-      setLoading(false); // End loading
+      setLoading(false);
     }
   };
   
   return (
     <View style={styles.container}>
-      {/* Back Button */}
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
         <Icon name="arrow-back" size={24} color="#000" />
       </TouchableOpacity>
 
-      {/* Title */}
       <Text style={styles.title}>Create account</Text>
-
-      {/* Input Label */}
       <Text style={styles.label}>Input your phone number</Text>
 
-      {/* Phone Number Input */}
-      <TextInput
-        style={styles.input}
-        placeholder="Enter phone number"
-        placeholderTextColor={styles.placeholder.color} 
-        keyboardType="phone-pad"
-        value={phoneNumber}
-        onChangeText={(text) => setPhoneNumber(text)}
-      />
+      <View style={styles.inputWrapper}>
+        {!isFocused && !phoneNumber && (
+          <Text style={styles.customPlaceholder}>Enter phone number</Text>
+        )}
+        <TextInput
+          style={styles.input}
+          keyboardType="phone-pad"
+          value={phoneNumber}
+          onChangeText={(text) => setPhoneNumber(text)}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+        />
+      </View>
 
-      {/* Verify Button */}
       <TouchableOpacity
         onPress={handleVerify}
         style={[styles.verifyButton, loading && styles.verifyButtonDisabled]}
         disabled={loading}
       >
         {loading ? (
-          <ActivityIndicator size="small" color="#fff" /> // Loading spinner
+          <ActivityIndicator size="small" color="#fff" />
         ) : (
           <Text style={styles.verifyButtonText}>Verify</Text>
         )}
       </TouchableOpacity>
 
-      {/* Already have an account */}
       <View style={styles.loginContainer}>
         <Text style={styles.loginText}>Already have an account? </Text>
         <TouchableOpacity onPress={() => navigation.navigate('login')}>
@@ -84,7 +82,6 @@ const CreateAccountScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {/* Terms and Privacy Policy */}
       <Text style={styles.termsText}>
         By continuing to use Skillovia, you agree to our{' '}
         <Text style={styles.link}>Terms of Service</Text> and{' '}
@@ -116,6 +113,10 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 10,
   },
+  inputWrapper: {
+    position: 'relative',
+    marginBottom: 30,
+  },
   input: {
     height: 50,
     borderWidth: 1,
@@ -125,11 +126,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'AlbertSans-Medium',
     color: '#000',
-    marginBottom: 30,
   },
-  placeholder: {
-    color: '#999', 
-    fontFamily: 'AlbertSans-Medium',// Custom placeholder color
+  customPlaceholder: {
+    position: 'absolute',
+    left: 15,
+    top: 15,
+    fontSize: 16,
+    color: '#999',
+    fontFamily: 'AlbertSans-Medium',
   },
   verifyButton: {
     backgroundColor: Color.primary,
@@ -139,7 +143,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   verifyButtonDisabled: {
-    backgroundColor: '#A9A9A9', // Disabled button color
+    backgroundColor: '#A9A9A9',
   },
   verifyButtonText: {
     fontSize: 16,
