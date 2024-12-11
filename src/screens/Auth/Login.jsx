@@ -76,7 +76,7 @@ const LoginScreen = ({ navigation }) => {
       </TouchableOpacity>
 
       {/* Login Button */}
-      <TouchableOpacity onPress={handleLogin} style={styles.loginButton} disabled={loading}>
+      <TouchableOpacity  onPress={() => navigation.navigate('home')} style={styles.loginButton} disabled={loading}>
         {loading ? (
           <ActivityIndicator size="small" color="#fff" />
         ) : (

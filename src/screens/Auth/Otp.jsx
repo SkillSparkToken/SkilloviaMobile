@@ -15,7 +15,7 @@ import { Color } from '../../Utils/Theme';
 
 const OtpScreen = ({ route, navigation }) => {
   const { phoneNumber } = route.params; 
-  const [otp, setOtp] = useState(['', '', '', '']); 
+  const [otp, setOtp] = useState(['', '', '', '', '', '']); 
   const [loading, setLoading] = useState(false);
   const [countdown, setCountdown] = useState(30); 
   const [timerActive, setTimerActive] = useState(false);
@@ -33,31 +33,41 @@ const OtpScreen = ({ route, navigation }) => {
   };
 
   // OTP verification
-  const handleOtpVerification = async () => {
-    const otpCode = otp.join('');
-    if (!otpCode || otpCode.length < 4) {
-      Alert.alert('Error', 'Please enter the full OTP');
-      return;
-    }
+// OTP verification
+const handleOtpVerification = async () => {
+  const otpCode = otp.join('');
+  console.log('Entered OTP:', otpCode); // Log the entered OTP
+  console.log('Phone Number:', phoneNumber); // Log the phone number
 
-    try {
-      setLoading(true);
-      const response = await apiClient.post('/api/auth/verifyphone', {
-        phone: phoneNumber,
-        code: otpCode,
-      });
+  if (!otpCode || otpCode.length < 4) {
+    Alert.alert('Error', 'Please enter the full OTP');
+    console.log('Error: Incomplete OTP'); // Log the error
+    return;
+  }
 
-      if (response.data.status === 'success') {
-        navigation.navigate('personal'); 
-      } else {
-        Alert.alert('Error', response.data.message || 'OTP verification failed');
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Something went wrong. Please try again');
-    } finally {
-      setLoading(false);
+  try {
+    setLoading(true);
+    const response = await apiClient.post('/api/auth/verifyphone', {
+      phone: phoneNumber,
+      code: otpCode,
+    });
+    
+    console.log('API Response:', response); // Log the entire response object
+
+    if (response.data.status === 'success') {
+      console.log('OTP verification successful'); // Log success
+      navigation.navigate('personal');
+    } else {
+      console.log('OTP verification failed:', response.data.message); // Log failure details
+      Alert.alert('Error', response.data.message || 'OTP verification failed');
     }
-  };
+  } catch (error) {
+    console.error('API Error:', error); // Log the error
+    Alert.alert('Error', 'Something went wrong. Please try again');
+  } finally {
+    setLoading(false);
+  }
+};
 
   // Resend OTP functionality and countdown timer
   const handleResendOtp = () => {
@@ -124,11 +134,11 @@ const OtpScreen = ({ route, navigation }) => {
         <Text style={styles.resendText}>
           Resend OTP in {countdown}s
         </Text>
-        {!timerActive && (
+        {/* {!timerActive && (
           <TouchableOpacity onPress={handleResendOtp} style={styles.resendButton}>
             <Text>Resend OTP</Text>
           </TouchableOpacity>
-        )}
+        )} */}
 
         <Text style={styles.loginText}>
           Already have an account?{' '}
