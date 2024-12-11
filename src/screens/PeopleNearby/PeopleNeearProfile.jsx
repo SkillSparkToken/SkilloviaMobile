@@ -34,7 +34,7 @@ const PeopleNearProfile = ({navigation}) => {
           {renderStars(rating)}
         </View>
       </View>
-      <TouchableOpacity style={styles.bookButton}>
+      <TouchableOpacity onPress={() => navigation.navigate("viewservice")} style={styles.bookButton}>
         <Text style={styles.bookButtonText}>Book</Text>
       </TouchableOpacity>
     </View>
