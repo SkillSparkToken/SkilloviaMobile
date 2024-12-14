@@ -31,6 +31,13 @@ import IDscreen from './src/screens/Kyc/IDscreen';
 import ChangePasswordScreen from './src/screens/Security/ChangPassword';
 import SkillDetailsScreen from './src/screens/Myskills/SkillDetails';
 import EmptySkillsScreen from './src/screens/Myskills/EmptySKill';
+import PeopleNearProfile from './src/screens/PeopleNearby/PeopleNeearProfile';
+import Explore from './src/screens/Explore/Explore';
+import ViewService from './src/screens/Booking/BookService/ViewService';
+import BookServiceForm from './src/screens/Booking/BookService/BookServiceForm';
+import SummaryPage from './src/screens/Booking/BookService/SummaryPage';
+import InwardDetails from './src/screens/Booking/BookingInward/InwardDetails';
+
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -219,7 +226,46 @@ const App = () => {
           component={EmptySkillsScreen} 
           options={{ headerShown: false }}
         />
+
+
+<Stack.Screen
+          name="peopleProfile"
+          component={PeopleNearProfile} 
+          options={{ headerShown: false }}
+        />
+
+<Stack.Screen
+          name="explore"
+          component={Explore} 
+          options={{ headerShown: false }}
+        />
+
+
+<Stack.Screen
+          name="viewservice"
+          component={ViewService} 
+          options={{ headerShown: false }}
+        />
         
+        <Stack.Screen
+          name="serviceform"
+          component={BookServiceForm} 
+          options={{ headerShown: false }}
+        />
+
+<Stack.Screen
+          name="summarypage"
+          component={SummaryPage} 
+          options={{ headerShown: false }}
+        />
+
+
+<Stack.Screen
+          name="inwardsDetails"
+          component={InwardDetails} 
+          options={{ headerShown: false }}
+        />
+
       </Stack.Navigator>
     </NavigationContainer>
   );
