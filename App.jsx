@@ -36,6 +36,7 @@ import Explore from './src/screens/Explore/Explore';
 import ViewService from './src/screens/Booking/BookService/ViewService';
 import BookServiceForm from './src/screens/Booking/BookService/BookServiceForm';
 import SummaryPage from './src/screens/Booking/BookService/SummaryPage';
+import InwardDetails from './src/screens/Booking/BookingInward/InwardDetails';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -255,6 +256,13 @@ const App = () => {
 <Stack.Screen
           name="summarypage"
           component={SummaryPage} 
+          options={{ headerShown: false }}
+        />
+
+
+<Stack.Screen
+          name="inwardsDetails"
+          component={InwardDetails} 
           options={{ headerShown: false }}
         />
 
