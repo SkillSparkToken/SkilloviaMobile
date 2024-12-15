@@ -7,5 +7,6 @@ export const Color = {
     card: '#FFEE87', 
     gray: '#EAF0E0', 
     text: '#171D14',
+    verify: '#246868',
     
 }

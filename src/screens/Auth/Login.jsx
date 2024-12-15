@@ -1,9 +1,43 @@
-import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons'; 
+
 import { Color } from '../../Utils/Theme';
+import apiClient from '../../Hooks/Api';
 
 const LoginScreen = ({ navigation }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  // Function to handle login
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please enter both email and password');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await apiClient.post('/api/auth/login', {
+        email,  
+        password,
+      });
+
+      if (response.data.status === 'success') {
+        // On success, navigate to the home screen
+        navigation.navigate('home');
+      } else {
+        Alert.alert('Login Failed', response.data.message || 'Please check your credentials');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Something went wrong. Please try again');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* Back Button */}
@@ -21,6 +55,8 @@ const LoginScreen = ({ navigation }) => {
         placeholder="john@example.com"
         placeholderTextColor="#999"
         keyboardType="email-address"
+        value={email}
+        onChangeText={(text) => setEmail(text)}
       />
 
       {/* Password Input */}
@@ -30,6 +66,8 @@ const LoginScreen = ({ navigation }) => {
         placeholder="********"
         placeholderTextColor="#999"
         secureTextEntry={true}
+        value={password}
+        onChangeText={(text) => setPassword(text)}
       />
 
       {/* Forgot Password */}
@@ -38,8 +76,12 @@ const LoginScreen = ({ navigation }) => {
       </TouchableOpacity>
 
       {/* Login Button */}
-      <TouchableOpacity onPress={() => navigation.navigate('home')} style={styles.loginButton}>
-        <Text style={styles.loginButtonText}>Log in</Text>
+      <TouchableOpacity  onPress={() => navigation.navigate('home')} style={styles.loginButton} disabled={loading}>
+        {loading ? (
+          <ActivityIndicator size="small" color="#fff" />
+        ) : (
+          <Text style={styles.loginButtonText}>Log in</Text>
+        )}
       </TouchableOpacity>
 
       {/* Sign-Up Link */}
@@ -97,7 +139,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'AlbertSans-Medium',
     color: Color.secondary,
-  
     marginBottom: 30,
   },
   loginButton: {
