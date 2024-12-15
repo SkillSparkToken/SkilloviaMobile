@@ -1,6 +1,7 @@
 /* eslint-disable react/no-unstable-nested-components */
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
+
 import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import LoginScreen from './src/screens/Auth/Login';
@@ -37,6 +38,9 @@ import ViewService from './src/screens/Booking/BookService/ViewService';
 import BookServiceForm from './src/screens/Booking/BookService/BookServiceForm';
 import SummaryPage from './src/screens/Booking/BookService/SummaryPage';
 import InwardDetails from './src/screens/Booking/BookingInward/InwardDetails';
+import ServiceCompleted from './src/screens/Booking/BookingInward/SerciceCompleted';
+import MessagesListScreen from './src/screens/Chat/MessagesListScreen';
+import ChatScreen from './src/screens/Chat/ChatScreen';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -263,6 +267,30 @@ const App = () => {
 <Stack.Screen
           name="inwardsDetails"
           component={InwardDetails} 
+          options={{ headerShown: false }}
+        />
+
+
+<Stack.Screen
+          name="servicesCompleted"
+          component={ServiceCompleted} 
+          options={{ headerShown: false }}
+        />
+
+
+
+
+
+<Stack.Screen
+          name="Chats"
+          component={MessagesListScreen}
+          options={{ headerShown: false }}
+        />
+
+
+<Stack.Screen
+          name="message"
+          component={ChatScreen}
           options={{ headerShown: false }}
         />
 

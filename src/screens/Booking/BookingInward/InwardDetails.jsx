@@ -98,7 +98,7 @@ const InwardDetails = ({navigation}) => {
         </View>
 
         <View style={styles.actionContainer}>
-          <TouchableOpacity style={styles.confirmButton}>
+          <TouchableOpacity onPress={()=> navigation.navigate("servicesCompleted")} style={styles.confirmButton}>
             <Text style={styles.confirmButtonText}>Confirm booking</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.rejectButton}>
