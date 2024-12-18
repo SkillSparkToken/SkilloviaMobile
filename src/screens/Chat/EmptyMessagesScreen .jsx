@@ -6,7 +6,7 @@ const EmptyMessagesScreen = () => {
   return (
     <View style={styles.container}>
       <Image
-        source={require('../assets/empty-mailbox.png')}
+        source={{ uri: "" }}
         style={styles.emptyImage}
       />
       <Text style={styles.emptyText}>Nothing to see here!</Text>

@@ -7,25 +7,30 @@ import {
   TextInput,
   Image,
   Text,
+  StatusBar,
+  SafeAreaView,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
+import { Color } from '../../Utils/Theme';
+import EmptyMessagesScreen from './EmptyMessagesScreen ';
 
 const MessagesListScreen = ({ navigation }) => {
   const [messages] = useState([
     {
       id: '1',
-      name: 'Schowatter LLC',
-      message: 'You: Thank you...',
+      name: 'Schowalter LLC',
+      message: 'You: Thank you,...',
       time: '11:37am',
       avatar: 'https://randomuser.me/api/portraits/men/1.jpg',
-      hasNewMessage: false,
+      unreadCount: 0,
     },
     {
       id: '2',
       name: 'Wuckert - Price',
-      message: 'Soluta rerum quibusdam omnis...',
+      message: 'Soluta natus quisquam omnis...',
       time: '11:37am',
       avatar: 'https://randomuser.me/api/portraits/men/2.jpg',
-      hasNewMessage: true,
+      unreadCount: 4,
     },
     {
       id: '3',
@@ -33,7 +38,7 @@ const MessagesListScreen = ({ navigation }) => {
       message: 'Doloremque fugiat maxime r...',
       time: '11:37am',
       avatar: 'https://randomuser.me/api/portraits/women/3.jpg',
-      hasNewMessage: true,
+      unreadCount: 4,
     },
     {
       id: '4',
@@ -41,7 +46,7 @@ const MessagesListScreen = ({ navigation }) => {
       message: 'Pariatur perferendis corporis...',
       time: '11:37am',
       avatar: 'https://randomuser.me/api/portraits/men/4.jpg',
-      hasNewMessage: true,
+      unreadCount: 4,
     },
     {
       id: '5',
@@ -49,7 +54,7 @@ const MessagesListScreen = ({ navigation }) => {
       message: 'Fugiat eligendi et cumque do...',
       time: '11:37am',
       avatar: 'https://randomuser.me/api/portraits/women/5.jpg',
-      hasNewMessage: false,
+      unreadCount: 4,
     },
   ]);
 
@@ -66,94 +71,136 @@ const MessagesListScreen = ({ navigation }) => {
     >
       <View style={styles.avatarContainer}>
         <Image source={{ uri: item.avatar }} style={styles.avatar} />
-        {item.hasNewMessage && <View style={styles.dotIndicator} />}
       </View>
       <View style={styles.messageContent}>
-        <Text style={styles.name}>{item.name}</Text>
-        <Text style={styles.messageText}>{item.message}</Text>
+        <View style={styles.messageHeader}>
+          <Text style={styles.name}>{item.name}</Text>
+          <View style={styles.timeContainer}>
+            <Text style={styles.time}>{item.time}</Text>
+            {item.unreadCount > 0 && (
+              <View style={styles.unreadBadge}>
+                <Text style={styles.unreadCount}>{item.unreadCount}</Text>
+              </View>
+            )}
+          </View>
+        </View>
+        <Text style={styles.messageText} numberOfLines={1}>
+          {item.message}
+        </Text>
       </View>
-      <Text style={styles.time}>{item.time}</Text>
     </TouchableOpacity>
   );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#fff" />
       <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search messages"
-          placeholderTextColor="#666"
-        />
+        <View style={styles.searchInputContainer}>
+        <Icon name="search" size={24} color="#888" style={styles.searchIcon} />
+   
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search messages"
+            placeholderTextColor="#666"
+          />
+        </View>
       </View>
       <FlatList
         data={messages}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         style={styles.list}
+        showsVerticalScrollIndicator={false}
+        ListEmptyComponent={EmptyMessagesScreen}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: Color.background,
   },
   searchContainer: {
-    padding: 10,
+    padding: 16,
+    paddingTop:60,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    borderBottomColor: '#F0F0F0',
+  },
+  searchInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+
+    borderRadius: 32,
+    paddingHorizontal: 12,
+    borderWidth:1
+  },
+  searchIcon: {
+    marginRight: 8,
   },
   searchInput: {
-    backgroundColor: '#f2f2f2',
-    padding: 10,
-    borderRadius: 10,
+    flex: 1,
+    height: 44,
+    fontFamily: 'AlbertSans-Regular',
     fontSize: 16,
+    color: '#333',
   },
   messageItem: {
     flexDirection: 'row',
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+    padding: 16,
     alignItems: 'center',
   },
   avatarContainer: {
-    position: 'relative',
-    width: 50,
-    height: 50,
+    marginRight: 12,
   },
   avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-  },
-  dotIndicator: {
-    position: 'absolute',
-    right: 0,
-    bottom: 0,
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: '#4CAF50',
-    borderWidth: 2,
-    borderColor: '#fff',
+    width: 48,
+    height: 48,
+    borderRadius: 24,
   },
   messageContent: {
     flex: 1,
-    marginLeft: 15,
+  },
+  messageHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
   },
   name: {
+    fontFamily: 'AlbertSans-Medium',
     fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 5,
+    color: '#333',
   },
-  messageText: {
-    color: '#666',
+  timeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   time: {
+    fontFamily: 'AlbertSans-Regular',
+    fontSize: 13,
     color: '#666',
-    fontSize: 12,
+    marginRight: 8,
+  },
+  unreadBadge: {
+    backgroundColor: '#4CAF50',
+    borderRadius: 12,
+    minWidth: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+  },
+  unreadCount: {
+    fontFamily: 'AlbertSans-Medium',
+    fontSize: 13,
+    color: '#fff',
+  },
+  messageText: {
+    fontFamily: 'AlbertSans-Regular',
+    fontSize: 14,
+    color: '#666',
   },
   list: {
     flex: 1,
