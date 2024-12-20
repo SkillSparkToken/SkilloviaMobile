@@ -13,22 +13,22 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const Notify = ({ navigation }) => {
   const [notifications] = useState([
-    // {
-    //   id: '1',
-    //   title: 'New Feature Alert!',
-    //   message: "We're pleased to introduce the latest enhancements in our templating experience.",
-    //   time: '15h',
-    //   icon: 'https://yourapp.com/notification-icon.png', // Replace with your actual icon
-    //   date: 'Today'
-    // },
-    // {
-    //   id: '2',
-    //   title: 'New Feature Alert!',
-    //   message: "We're pleased to introduce the latest enhancements in our templating experience.",
-    //   time: '15h',
-    //   icon: 'https://yourapp.com/notification-icon.png', // Replace with your actual icon
-    //   date: 'Today'
-    // }
+    {
+      id: '1',
+      title: 'New Feature Alert!',
+      message: "We're pleased to introduce the latest enhancements in our templating experience.",
+      time: '15h',
+      icon: 'https://yourapp.com/notification-icon.png', // Replace with your actual icon
+      date: 'Today'
+    },
+    {
+      id: '2',
+      title: 'New Feature Alert!',
+      message: "We're pleased to introduce the latest enhancements in our templating experience.",
+      time: '15h',
+      icon: 'https://yourapp.com/notification-icon.png', // Replace with your actual icon
+      date: 'Today'
+    }
   ]);
 
   const EmptyState = () => (

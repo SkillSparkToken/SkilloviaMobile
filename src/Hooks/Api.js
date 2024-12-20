@@ -3,7 +3,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const api = axios.create({
-  baseURL: 'https://skilloviaapis.vercel.app/',
+  baseURL: 'https://testapi.humanserve.net',
   timeout: 10000, // 10 seconds
   headers: {
     'Content-Type': 'application/json',
