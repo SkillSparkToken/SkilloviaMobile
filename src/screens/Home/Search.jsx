@@ -1,9 +1,11 @@
 import React from 'react';
-import { SafeAreaView, View, Text, StyleSheet, TextInput, Image, StatusBar } from 'react-native';
+import { SafeAreaView, View, Text, StyleSheet, TextInput, Image, StatusBar, Pressable, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { Color } from '../../Utils/Theme'; // If you don't have this, use your preferred colors.
-
+import { useNavigation } from '@react-navigation/native';
 const Search = () => {
+
+  const navigation = useNavigation(); // Add this hook
   return (
     <SafeAreaView style={styles.safeArea}>
   
@@ -18,14 +20,16 @@ const Search = () => {
 
           {/* Notification and Profile Icons */}
           <View style={styles.iconWrapper}>
-            <View style={[styles.iconBadgeWrapper, { backgroundColor: '#FFEE87' }]}>
+
+            <TouchableOpacity onPress={() => navigation.navigate('notify')} style={[styles.iconBadgeWrapper, { backgroundColor: '#FFEE87' }]}>
               <Icon name="notifications-outline" size={20} />
               <View style={styles.badge} />
-            </View>
-            <View style={[styles.iconBadgeWrapper, { backgroundColor: '#8FF15F' }]}>
+            </TouchableOpacity>
+
+            <TouchableOpacity  onPress={() => navigation.navigate('Chats')} style={[styles.iconBadgeWrapper, { backgroundColor: '#8FF15F' }]}>
               <Icon name="chatbubbles" size={20} color="#00B761" />
               <View style={styles.badge} />
-            </View>
+            </TouchableOpacity>
           </View>
         </View>
 

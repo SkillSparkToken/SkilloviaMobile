@@ -32,6 +32,8 @@
 		A5B40E5861A04F3BB14F95DD /* AlbertSans-SemiBoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 68C2959ACBCA432CBBA2582E /* AlbertSans-SemiBoldItalic.ttf */; };
 		310FD6CC97A943C0B922879E /* AlbertSans-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 28E1907517A145F2B8E844DB /* AlbertSans-Thin.ttf */; };
 		5D0F1BF9F4E64043A2DDD79C /* AlbertSans-ThinItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E6E17FFBF6DC459C9958CDBF /* AlbertSans-ThinItalic.ttf */; };
+		83B2AB88B04C43B8BE2514EA /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 03DEF6E3A03B4BF49B2C02EE /* BootSplash.storyboard */; };
+		3738F03E1C974D1A92AD9324 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2C0F9101A5874B1A9682DAD8 /* Colors.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -81,6 +83,8 @@
 		68C2959ACBCA432CBBA2582E /* AlbertSans-SemiBoldItalic.ttf */ = {isa = PBXFileReference; name = "AlbertSans-SemiBoldItalic.ttf"; path = "../assets/fonts/AlbertSans-SemiBoldItalic.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		28E1907517A145F2B8E844DB /* AlbertSans-Thin.ttf */ = {isa = PBXFileReference; name = "AlbertSans-Thin.ttf"; path = "../assets/fonts/AlbertSans-Thin.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 		E6E17FFBF6DC459C9958CDBF /* AlbertSans-ThinItalic.ttf */ = {isa = PBXFileReference; name = "AlbertSans-ThinItalic.ttf"; path = "../assets/fonts/AlbertSans-ThinItalic.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		03DEF6E3A03B4BF49B2C02EE /* BootSplash.storyboard */ = {isa = PBXFileReference; name = "BootSplash.storyboard"; path = "skillovia/BootSplash.storyboard"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		2C0F9101A5874B1A9682DAD8 /* Colors.xcassets */ = {isa = PBXFileReference; name = "Colors.xcassets"; path = "skillovia/Colors.xcassets"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = folder.assetcatalog; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -130,6 +134,8 @@
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
 				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
+				03DEF6E3A03B4BF49B2C02EE /* BootSplash.storyboard */,
+				2C0F9101A5874B1A9682DAD8 /* Colors.xcassets */,
 			);
 			name = skillovia;
 			sourceTree = "<group>";
@@ -326,6 +332,8 @@
 				A5B40E5861A04F3BB14F95DD /* AlbertSans-SemiBoldItalic.ttf in Resources */,
 				310FD6CC97A943C0B922879E /* AlbertSans-Thin.ttf in Resources */,
 				5D0F1BF9F4E64043A2DDD79C /* AlbertSans-ThinItalic.ttf in Resources */,
+				83B2AB88B04C43B8BE2514EA /* BootSplash.storyboard in Resources */,
+				3738F03E1C974D1A92AD9324 /* Colors.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,4 +1,8 @@
-import React from 'react';
+
+
+
+
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -6,72 +10,110 @@ import {
   StyleSheet,
   ImageBackground,
   StatusBar,
+  Dimensions,
+  ScrollView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Color } from '../Utils/Theme';
 import Google from '../../assets/Icons/svgs/google';
 
+const { width } = Dimensions.get('window');
+
 const Onboarding = ({ navigation }) => {
+  const [currentPage, setCurrentPage] = useState(0);
+  const scrollViewRef = useRef(null);
+
+  const images = [
+    'https://res.cloudinary.com/dmhvsyzch/image/upload/v1732032776/212760ab183179b3b25c4e05722b52ed_rvwdpf.jpg',
+
+    'https://res.cloudinary.com/dmhvsyzch/image/upload/v1732049206/rsz_0f97c93d7e2a172dfab38a344f9b8ce0_r6frdm_i0xs60.jpg'
+  ];
+
+  const handleScroll = (event) => {
+    const contentOffset = event.nativeEvent.contentOffset;
+    const currentIndex = Math.round(contentOffset.x / width);
+    setCurrentPage(currentIndex);
+  };
+
   return (
     <View style={styles.container}>
-      {/* Status Bar visible but transparent */}
       <StatusBar translucent={true} backgroundColor="transparent" barStyle="light-content" />
-      {/* Static Background Image */}
-      <ImageBackground
-        source={{
-          uri: 'https://res.cloudinary.com/dmhvsyzch/image/upload/v1732032776/212760ab183179b3b25c4e05722b52ed_rvwdpf.jpg',
-        }}
-        style={styles.backgroundImage}
+      
+      <ScrollView
+        ref={scrollViewRef}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
       >
-        {/* Overlay Content */}
-        <View style={styles.overlay}>
-          <Text style={styles.title}>Get some shit {'\n'} done!</Text>
-
-          {/* Social Login Buttons */}
-          <TouchableOpacity style={[styles.socialButton, styles.facebook]}>
-            <Icon name="facebook" size={20} color="#fff" style={styles.icon} />
-            <Text style={styles.socialText}>Continue with Facebook</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={[styles.socialButton, styles.google]}>
-            <Google />
-            {/* <Icon name="google" size={20} color="#DB4437" style={styles.icon} /> */}
-            <Text style={[styles.socialText, styles.googleText]}>Continue with Google</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={[styles.socialButton, styles.apple]}>
-            <Icon name="apple" size={20} color="#fff" style={styles.icon} />
-            <Text style={styles.socialText}>Continue with Apple</Text>
-          </TouchableOpacity>
-
-          <View style={styles.divider}>
-            <Text style={styles.orText}>or</Text>
-          </View>
-
-          {/* Create Account Button */}
-          <TouchableOpacity
-            onPress={() => navigation.navigate('signup')}
-            style={styles.createAccountButton}
+        {images.map((image, index) => (
+          <ImageBackground
+            key={index}
+            source={{ uri: image }}
+            style={styles.backgroundImage}
           >
-            <Text style={styles.createAccountText}>Create an account</Text>
-          </TouchableOpacity>
+            <View style={styles.overlay}>
+              <Text style={styles.title}>Get some shit {'\n'} done!</Text>
 
-          <Text style={styles.footerText}>
-            Already have an account?{' '}
-            <Text
-              style={styles.loginText}
-              onPress={() => navigation.navigate('login')}
-            >
-              Log in
-            </Text>
-          </Text>
+              {/* Social Login Buttons */}
+              <TouchableOpacity style={[styles.socialButton, styles.facebook]}>
+                <Icon name="facebook" size={20} color="#fff" style={styles.icon} />
+                <Text style={styles.socialText}>Continue with Facebook</Text>
+              </TouchableOpacity>
 
-          <Text style={styles.termsText}>
-            By continuing to use Skillovia, you agree to our Terms of Service and
-            Privacy Policy
-          </Text>
-        </View>
-      </ImageBackground>
+              <TouchableOpacity style={[styles.socialButton, styles.google]}>
+                <Google />
+                <Text style={[styles.socialText, styles.googleText]}>Continue with Google</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={[styles.socialButton, styles.apple]}>
+                <Icon name="apple" size={20} color="#fff" style={styles.icon} />
+                <Text style={styles.socialText}>Continue with Apple</Text>
+              </TouchableOpacity>
+
+              <View style={styles.divider}>
+                <Text style={styles.orText}>or</Text>
+              </View>
+
+              <TouchableOpacity
+                onPress={() => navigation.navigate('signup')}
+                style={styles.createAccountButton}
+              >
+                <Text style={styles.createAccountText}>Create an account</Text>
+              </TouchableOpacity>
+
+              <Text style={styles.footerText}>
+                Already have an account?{' '}
+                <Text
+                  style={styles.loginText}
+                  onPress={() => navigation.navigate('login')}
+                >
+                  Log in
+                </Text>
+              </Text>
+
+              <Text style={styles.termsText}>
+                By continuing to use Skillovia, you agree to our Terms of Service and
+                Privacy Policy
+              </Text>
+            </View>
+          </ImageBackground>
+        ))}
+      </ScrollView>
+
+      {/* Pagination Dots */}
+      <View style={styles.paginationContainer}>
+        {images.map((_, index) => (
+          <View
+            key={index}
+            style={[
+              styles.paginationDot,
+              currentPage === index && styles.paginationDotActive,
+            ]}
+          />
+        ))}
+      </View>
     </View>
   );
 };
@@ -81,7 +123,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   backgroundImage: {
-    width: '100%',
+    width: width,
     height: '100%',
     resizeMode: 'cover',
   },
@@ -90,8 +132,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 12,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent overlay
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
+
+
   title: {
     fontSize: 38,
    
@@ -176,6 +220,27 @@ const styles = StyleSheet.create({
   
     marginTop: 10,
     fontFamily: 'AlbertSans-Light',
+  },
+
+
+  paginationContainer: {
+    flexDirection: 'row',
+    position: 'absolute',
+    bottom: 40,
+    alignSelf: 'center',
+  },
+  paginationDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+    marginHorizontal: 4,
+  },
+  paginationDotActive: {
+    backgroundColor: '#fff',
+    width: 12,
+    height: 12,
+    borderRadius: 6,
   },
 });
 
