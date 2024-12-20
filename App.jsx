@@ -1,6 +1,7 @@
 /* eslint-disable react/no-unstable-nested-components */
-import React from 'react';
+import React , {useEffect}from 'react';
 import { NavigationContainer } from '@react-navigation/native';
+import SplashScreen from 'react-native-splash-screen';
 
 import { createStackNavigator, CardStyleInterpolators } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -86,6 +87,10 @@ const HomeTabs = () => {
 };
 
 const App = () => {
+
+  useEffect(() => {
+    SplashScreen.hide(); // Hide splash screen once the app is ready
+  }, []);
   return (
     <NavigationContainer>
       <Stack.Navigator
