@@ -20,10 +20,12 @@ const Search = () => {
 
           {/* Notification and Profile Icons */}
           <View style={styles.iconWrapper}>
-            <View style={[styles.iconBadgeWrapper, { backgroundColor: '#FFEE87' }]}>
+
+            <TouchableOpacity onPress={() => navigation.navigate('notify')} style={[styles.iconBadgeWrapper, { backgroundColor: '#FFEE87' }]}>
               <Icon name="notifications-outline" size={20} />
               <View style={styles.badge} />
-            </View>
+            </TouchableOpacity>
+
             <TouchableOpacity  onPress={() => navigation.navigate('Chats')} style={[styles.iconBadgeWrapper, { backgroundColor: '#8FF15F' }]}>
               <Icon name="chatbubbles" size={20} color="#00B761" />
               <View style={styles.badge} />

@@ -41,6 +41,7 @@ import InwardDetails from './src/screens/Booking/BookingInward/InwardDetails';
 import ServiceCompleted from './src/screens/Booking/BookingInward/SerciceCompleted';
 import MessagesListScreen from './src/screens/Chat/MessagesListScreen';
 import ChatScreen from './src/screens/Chat/ChatScreen';
+import Notify from './src/screens/Chat/Notify';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -291,6 +292,12 @@ const App = () => {
 <Stack.Screen
           name="message"
           component={ChatScreen}
+          options={{ headerShown: false }}
+        />
+
+<Stack.Screen
+          name="notify"
+          component={Notify}
           options={{ headerShown: false }}
         />
 
