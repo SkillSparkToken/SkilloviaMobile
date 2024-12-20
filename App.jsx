@@ -89,7 +89,7 @@ const HomeTabs = () => {
 const App = () => {
 
   useEffect(() => {
-    SplashScreen.hide(); // Hide splash screen once the app is ready
+    SplashScreen.hide(); 
   }, []);
   return (
     <NavigationContainer>
