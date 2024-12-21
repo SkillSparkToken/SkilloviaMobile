@@ -43,6 +43,9 @@ import ServiceCompleted from './src/screens/Booking/BookingInward/SerciceComplet
 import MessagesListScreen from './src/screens/Chat/MessagesListScreen';
 import ChatScreen from './src/screens/Chat/ChatScreen';
 import Notify from './src/screens/Chat/Notify';
+import BookingProgress from './src/screens/Booking/BookingOutward/BookingProgress';
+import OutwardDetails from './src/screens/Booking/BookingOutward/OutwardDetails';
+import WriteReview from './src/screens/Booking/WriteReview';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -284,6 +287,24 @@ const App = () => {
         />
 
 
+<Stack.Screen
+          name="bookingProgress"
+          component={BookingProgress} 
+          options={{ headerShown: false }}
+        />
+
+<Stack.Screen
+          name="outwardDetails"
+          component={OutwardDetails} 
+          options={{ headerShown: false }}
+        />
+
+
+<Stack.Screen
+          name="review"
+          component={WriteReview}
+          options={{ headerShown: false }}
+        />
 
 
 
@@ -305,6 +326,9 @@ const App = () => {
           component={Notify}
           options={{ headerShown: false }}
         />
+
+
+
 
       </Stack.Navigator>
     </NavigationContainer>
