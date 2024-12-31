@@ -77,7 +77,7 @@ const Onboarding = ({ navigation }) => {
               </View>
 
               <TouchableOpacity
-                onPress={() => navigation.navigate('signup')}
+                onPress={() => navigation.navigate('welcome')}
                 style={styles.createAccountButton}
               >
                 <Text style={styles.createAccountText}>Create an account</Text>
