@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { Color } from '../../Utils/Theme';
+import Members from './Members';
 
 const Feed = () => {
   const [activeTab, setActiveTab] = useState('Feed');
@@ -32,9 +33,9 @@ const Feed = () => {
   );
 
   const renderMembers = () => (
-    <View style={styles.centerContent}>
-      <Icon name="people-outline" size={48} color="#666" />
-      <Text style={styles.emptyStateText}>30k members</Text>
+    <View >
+
+      <Members />
     </View>
   );
 
@@ -190,7 +191,7 @@ const styles = StyleSheet.create({
   membershipRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    // alignItems: 'center',
   },
   memberCount: {
     fontFamily: 'AlbertSans-Medium',
