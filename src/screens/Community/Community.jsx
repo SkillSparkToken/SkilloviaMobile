@@ -1,4 +1,3 @@
-// App.js
 import React from 'react';
 import {
   SafeAreaView,
@@ -9,12 +8,13 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
+  StatusBar,
 } from 'react-native';
 import { Color } from '../../Utils/Theme';
 
 const windowWidth = Dimensions.get('window').width;
 
-const CommunityScreen = () => {
+const CommunityScreen = ({navigation}) => {
   const features = [
     {
       id: 1,
@@ -37,47 +37,58 @@ const CommunityScreen = () => {
   ];
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView>
-        <View style={styles.imageGrid}>
-          <Image
-            source={{ uri: "https://res.cloudinary.com/dmhvsyzch/image/upload/v1735602469/Frame_1000003971_mu3jrs.png" }}
-            style={styles.largeImage}
-          />
-          <View style={styles.smallImagesContainer}>
-            <Image
-              source={{ uri: "https://res.cloudinary.com/dmhvsyzch/image/upload/v1735602471/Frame_1000003970_e9fd3s.png" }}
-              style={styles.smallImage}
-            />
-            <Image
-              source={{ uri: "https://res.cloudinary.com/dmhvsyzch/image/upload/v1735602460/Frame_1000003970_1_kuvqtl.png" }}
-              style={styles.smallImage}
-            />
-          </View>
-        </View>
-
-        <View style={styles.contentContainer}>
-          <Text style={styles.title}>Welcome to Community</Text>
-          <Text style={styles.subtitle}>
-            Building connections, sharing knowledge, and fostering a sense of belonging within your neighborhood.
-          </Text>
-
-          {features.map((feature) => (
-            <View key={feature.id} style={styles.featureItem}>
-              <Text style={styles.featureIcon}>{feature.icon}</Text>
-              <View style={styles.featureTextContainer}>
-                <Text style={styles.featureTitle}>{feature.title}</Text>
-                <Text style={styles.featureDescription}>{feature.description}</Text>
-              </View>
+    <>
+      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+      <SafeAreaView style={styles.container}>
+        <ScrollView>
+          <View style={styles.imageGrid}>
+            {/* First row */}
+            <View style={styles.row}>
+              <Image
+                source={{ uri: "https://res.cloudinary.com/dmhvsyzch/image/upload/v1735602469/Frame_1000003971_mu3jrs.png" }}
+                style={[styles.gridImage, styles.largeImage]}
+              />
+              <Image
+                source={{ uri: "https://res.cloudinary.com/dmhvsyzch/image/upload/v1735602471/Frame_1000003970_e9fd3s.png" }}
+                style={[styles.gridImage, styles.smallImage]}
+              />
             </View>
-          ))}
+            {/* Second row */}
+            <View style={styles.row}>
+              <Image
+                source={{ uri: "https://res.cloudinary.com/dmhvsyzch/image/upload/v1735602460/Frame_1000003970_1_kuvqtl.png" }}
+                style={[styles.gridImage, styles.smallImage]}
+              />
+              <Image
+              source={{ uri: "https://res.cloudinary.com/dmhvsyzch/image/upload/v1735602468/Frame_1000003971_1_qpw9pt.png" }}
+                style={[styles.gridImage, styles.largeImage]}
+              />
+            </View>
+          </View>
 
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Check it out</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+          <View style={styles.contentContainer}>
+            <Text style={styles.title}>Welcome to Community</Text>
+            <Text style={styles.subtitle}>
+              Building connections, sharing knowledge, and fostering a sense of belonging within your neighborhood.
+            </Text>
+
+            {features.map((feature) => (
+              <View key={feature.id} style={styles.featureItem}>
+                <Text style={styles.featureIcon}>{feature.icon}</Text>
+                <View style={styles.featureTextContainer}>
+                  <Text style={styles.featureTitle}>{feature.title}</Text>
+                  <Text style={styles.featureDescription}>{feature.description}</Text>
+                </View>
+              </View>
+            ))}
+
+            <TouchableOpacity onPress={()=> navigation.navigate("communityList")} style={styles.button}>
+              <Text style={styles.buttonText}>Check it out</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    </>
   );
 };
 
@@ -88,20 +99,21 @@ const styles = StyleSheet.create({
   },
   imageGrid: {
     width: windowWidth,
-    height: windowWidth * 0.8,
+    height: windowWidth * 0.8,  // Adjusted for better proportions
+  },
+  row: {
+    flexDirection: 'row',
+    height: '50%',
+  },
+  gridImage: {
+    height: '100%',
+    resizeMode: 'cover',
   },
   largeImage: {
-    width: '100%',
-    height: '60%',
-    resizeMode: 'cover',
-  },
-  smallImagesContainer: {
-    flexDirection: 'row',
-    height: '40%',
+    flex: 0.65,  // Takes up 65% of the row width
   },
   smallImage: {
-    flex: 1,
-    resizeMode: 'cover',
+    flex: 0.35,  // Takes up 35% of the row width
   },
   contentContainer: {
     padding: 20,
@@ -122,9 +134,7 @@ const styles = StyleSheet.create({
   featureItem: {
     flexDirection: 'row',
     alignItems: 'center',
-  
     paddingVertical: 16,
-
   },
   featureIcon: {
     fontSize: 24,
@@ -135,7 +145,6 @@ const styles = StyleSheet.create({
   },
   featureTextContainer: {
     flex: 1,
-    
   },
   featureTitle: {
     fontFamily: 'AlbertSans-SemiBold',
