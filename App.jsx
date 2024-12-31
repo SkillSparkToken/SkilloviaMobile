@@ -46,6 +46,8 @@ import Notify from './src/screens/Chat/Notify';
 import BookingProgress from './src/screens/Booking/BookingOutward/BookingProgress';
 import OutwardDetails from './src/screens/Booking/BookingOutward/OutwardDetails';
 import WriteReview from './src/screens/Booking/WriteReview';
+import CommunityListScreen from './src/screens/Community/CommunityList';
+import Feed from './src/screens/Community/Feed';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -328,6 +330,20 @@ const App = () => {
         />
 
 
+<Stack.Screen
+          name="communityList"
+          component={CommunityListScreen}
+          options={{ headerShown: false }}
+        />
+
+
+
+
+<Stack.Screen
+          name="feed"
+          component={Feed}
+          options={{ headerShown: false }}
+        />
 
 
       </Stack.Navigator>
