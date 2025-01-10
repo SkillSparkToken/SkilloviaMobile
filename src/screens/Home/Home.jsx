@@ -20,15 +20,13 @@ import VerifyEmail from '../Auth/VerifyEmail';
 
 const Home = ({navigation}) => {
   const [showActivateModal, setShowActivateModal] = useState(false);
-  const [showProfileModal, setShowProfileModal] = useState(false);
+
 
   const handleActivateAccount = () => {
     setShowActivateModal(true);
   };
 
-  const handleCompleteProfile = () => {
-    setShowProfileModal(true);
-  };
+
 
   const peopleList = [
     {
@@ -91,7 +89,7 @@ const Home = ({navigation}) => {
         >
           <Text style={styles.cardTitle}>Please verify your email</Text>
           <Text style={styles.cardDescription}>
-            We sent a confirmation email to example@gmail.com, please visit your email to review
+            We sent a confirmation email to user@gmail.com, please visit your email to review
             and activate your account
           </Text>
           <Text style={styles.cardAction}>Activate your account ▶</Text>
@@ -100,7 +98,7 @@ const Home = ({navigation}) => {
         {/* Complete Profile Card */}
         <TouchableOpacity
           style={[styles.card2, { backgroundColor: '#8FF15F' }]}
-          onPress={handleCompleteProfile}
+          onPress={()=> navigation.navigate("Profile")}
         >
           <Text style={styles.cardTitle2}>Complete your profile</Text>
           <Text style={styles.cardDescription2}>
@@ -120,7 +118,16 @@ const Home = ({navigation}) => {
 
 <View>
 
-<Text style={styles.sectionTitle}>Explore services</Text>
+
+<View style={styles.sectionHeader}>
+    <Text style={styles.sectionTitle}>Explore services</Text>
+      <TouchableOpacity onPress={()=> navigation.navigate("explore")} style={styles.viewMoreContainer}>
+        <Text style={styles.viewMoreText}>View More</Text>
+        <Icon name="chevron-forward" size={20} color="#555" style={styles.icon} />
+      </TouchableOpacity>
+    </View>
+
+
 <FlatList
   data={services}
   horizontal
@@ -148,29 +155,14 @@ const Home = ({navigation}) => {
 
   </ScrollView>
 
-        {/* Activate Account Modal */}
       {/* Activate Account Modal */}
 <Modal visible={showActivateModal} transparent={true} animationType="slide">
   <View style={styles.modalContainer}>
+    
     <VerifyEmail onClose={() => setShowActivateModal(false)} />
   </View>
 </Modal>
 
-        {/* Complete Profile Modal */}
-        <Modal visible={showProfileModal} transparent={true} animationType="slide">
-          <View style={styles.modalContainer}>
-            <Text style={styles.modalTitle}>Complete Profile</Text>
-            <Text style={styles.modalDescription}>
-              Add your skills, set your availability, and update your profile to find clients.
-            </Text>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setShowProfileModal(false)}
-            >
-              <Text style={styles.closeButtonText}>Close</Text>
-            </TouchableOpacity>
-          </View>
-        </Modal>
       </View>
     </SafeAreaView>
   );
@@ -320,6 +312,32 @@ const styles = StyleSheet.create({
     color: Color.secondary
   },
   
+
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 4,
+  },
+  view: {
+    fontSize: 18,
+    fontFamily: 'AlbertSans-Bold',
+    color: '#333',
+  },
+  viewMoreContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  viewMoreText: {
+    fontSize: 14,
+    fontFamily: 'AlbertSans-Medium',
+    color: '#555',
+ 
+  },
+  icon: {
+    marginLeft: 2,
+    color: Color.secondary
+  },
  
 
 });

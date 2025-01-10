@@ -48,6 +48,7 @@ import OutwardDetails from './src/screens/Booking/BookingOutward/OutwardDetails'
 import WriteReview from './src/screens/Booking/WriteReview';
 import CommunityListScreen from './src/screens/Community/CommunityList';
 import Feed from './src/screens/Community/Feed';
+import SearchScreen from './src/screens/Search/Search';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -142,6 +143,12 @@ const App = () => {
         <Stack.Screen
           name="home"
           component={HomeTabs} 
+          options={{ headerShown: false }}
+        />
+
+<Stack.Screen
+          name="search-sc"
+          component={SearchScreen} 
           options={{ headerShown: false }}
         />
 
