@@ -1,8 +1,19 @@
 import React from 'react';
 import { SafeAreaView, View, Text, StyleSheet, TextInput, Image, StatusBar, Pressable, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+
 import { Color } from '../../Utils/Theme'; // If you don't have this, use your preferred colors.
 import { useNavigation } from '@react-navigation/native';
+
+
+
+
+
+
+
+
+
 const Search = () => {
 
   const navigation = useNavigation(); // Add this hook
@@ -27,21 +38,26 @@ const Search = () => {
             </TouchableOpacity>
 
             <TouchableOpacity  onPress={() => navigation.navigate('Chats')} style={[styles.iconBadgeWrapper, { backgroundColor: '#8FF15F' }]}>
-              <Icon name="chatbubbles" size={20} color="#00B761" />
+            <FontAwesome5 name="facebook-messenger" size={20} color="#141301" />
               <View style={styles.badge} />
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* Search Bar */}
-        <View style={styles.searchWrapper}>
-          <Icon name="search-outline" size={20} color="#6B7280" />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search people, skills and communities"
-            placeholderTextColor="#6B7280"
-          />
-        </View>
+
+        <TouchableOpacity onPress={() => navigation.navigate("search-sc")}>
+      <View style={styles.searchWrapper}>
+        <Icon name="search-outline" size={20} color="#6B7280" />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search people, skills and communities"
+          placeholderTextColor="#6B7280"
+          editable={false} 
+        />
+      </View>
+    </TouchableOpacity>
+
+     
       </View>
     </SafeAreaView>
   );

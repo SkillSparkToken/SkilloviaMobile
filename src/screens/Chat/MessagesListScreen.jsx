@@ -13,6 +13,7 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { Color } from '../../Utils/Theme';
 import EmptyMessagesScreen from './EmptyMessagesScreen ';
+import FontAwesome from 'react-native-vector-icons/FontAwesome6';
 
 const MessagesListScreen = ({ navigation }) => {
   const [messages] = useState([
@@ -94,6 +95,13 @@ const MessagesListScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
+
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <FontAwesome name="arrow-left" size={20} color="#000" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Chats</Text>
+      </View>
       <View style={styles.searchContainer}>
         <View style={styles.searchInputContainer}>
         <Icon name="search" size={24} color="#888" style={styles.searchIcon} />
@@ -121,10 +129,29 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Color.background,
+    paddingTop: 40
   },
+
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E8E8E8',
+  },
+  backButton: {
+    marginRight: 16,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontFamily: 'AlbertSans-Regular',
+    color: '#000',
+  },
+
+
   searchContainer: {
     padding: 16,
-    paddingTop:60,
+    paddingTop:20,
     borderBottomWidth: 1,
     borderBottomColor: '#F0F0F0',
   },

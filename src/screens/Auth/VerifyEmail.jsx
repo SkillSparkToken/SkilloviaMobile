@@ -1,5 +1,7 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Modal } from 'react-native';
+import { Color } from '../../Utils/Theme';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const VerifyEmailModal = ({ visible, onClose }) => {
   return (
@@ -8,29 +10,33 @@ const VerifyEmailModal = ({ visible, onClose }) => {
         <View style={styles.modalContent}>
           {/* Close Button */}
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <Text style={styles.closeButtonText}>×</Text>
+            <Icon name="close" size={24} color="#000" />
           </TouchableOpacity>
 
-          {/* Email Icon */}
-          <Image
-            source={{
-              uri: 'https://res.cloudinary.com/dmhvsyzch/image/upload/v1732151638/Artwork_ek9843.png',
-            }}
-            style={styles.image}
-          />
+          <View style={styles.contentContainer}>
+            {/* Email Icon */}
+            <Image
+              source={{
+                uri: 'https://res.cloudinary.com/dmhvsyzch/image/upload/v1732151638/Artwork_ek9843.png',
+              }}
+              style={styles.image}
+            />
 
-          {/* Title and Text */}
-          <Text style={styles.title}>Verify email</Text>
-          <Text style={styles.subtitle}>We need to verify your email</Text>
-          <Text style={styles.emailText}>example@gmail.com</Text>
-          <Text style={styles.infoText}>
-            Check your email and click the link to activate your account
-          </Text>
+            {/* Title and Text */}
+            <Text style={styles.title}>Verify email</Text>
+            <Text style={styles.subtitle}>We need to verify your email</Text>
+            <Text style={styles.emailText}>user@gmail.com</Text>
+            <Text style={styles.infoText}>
+              Check your email and click the link to activate your account
+            </Text>
+          </View>
 
-          {/* Verify Button */}
-          <TouchableOpacity style={styles.verifyButton}>
-            <Text style={styles.verifyButtonText}>Verify</Text>
-          </TouchableOpacity>
+          {/* Bottom Button Container */}
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.verifyButton}>
+              <Text style={styles.verifyButtonText}>Verify</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </Modal>
@@ -38,31 +44,27 @@ const VerifyEmailModal = ({ visible, onClose }) => {
 };
 
 const styles = StyleSheet.create({
-    modalContainer: {
-        flex: 1,
-        justifyContent: 'flex-end', // Positions the content at the bottom
-        backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
-      },
-      modalContent: {
-        backgroundColor: '#F6FCEB',
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
-        padding: 20,
-        paddingBottom:0,
-        width: '100%',
-        alignItems: 'center',
-        height:500
-      },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(255, 255, 255, 0.4)', 
+  },
+  modalContent: {
+    backgroundColor: '#F6FCEB',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    width: '100%',
+    height: 500,
+    justifyContent: 'space-between',
+  },
+  contentContainer: {
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 20,
+  },
   closeButton: {
     alignSelf: 'flex-end',
-    backgroundColor: '#E5E5E5',
-    padding: 5,
-    borderRadius: 50,
-  },
-  closeButtonText: {
-    fontSize: 20,
-    fontFamily: 'AlbertSans-Regular',
-    color: '#000',
+    padding: 15,
   },
   image: {
     width: 120,
@@ -71,7 +73,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 22,
-    fontFamily: 'AlbertSans-Regular',
+    fontFamily: 'AlbertSans-Bold',
     color: '#333',
     textAlign: 'center',
     marginBottom: 10,
@@ -94,22 +96,25 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     textAlign: 'center',
+    fontFamily: 'AlbertSans-Regular',
     marginBottom: 20,
   },
+  buttonContainer: {
+    padding: 20,
+    backgroundColor: '#F6FCEB',
+  },
   verifyButton: {
-    backgroundColor: '#8FF15F',
+    backgroundColor: Color.primary,
     paddingVertical: 15,
     paddingHorizontal: 50,
     borderRadius: 25,
     alignItems: 'center',
-    width: '100%', 
-
-
+    width: '100%',
   },
   verifyButtonText: {
     fontSize: 16,
-    fontFamily: 'AlbertSans-Regular',
-    color: '#fff',
+    fontFamily: 'AlbertSans-Bold',
+    color: Color.secondary,
   },
 });
 

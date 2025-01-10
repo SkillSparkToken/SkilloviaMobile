@@ -19,7 +19,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome6';
 import Icon from 'react-native-vector-icons/FontAwesome6';
 import { Color } from '../../Utils/Theme';
 
-const ChatScreen = () => {
+const ChatScreen = ({navigation}) => {
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
@@ -149,7 +149,7 @@ const ChatScreen = () => {
   const renderHeader = () => {
     return (
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <FontAwesome name="arrow-left" size={20} color="#000" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Messages</Text>

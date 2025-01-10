@@ -10,6 +10,7 @@ import {
   FlatList,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { Color } from '../../Utils/Theme';
 
 const Notify = ({ navigation }) => {
   const [notifications] = useState([
@@ -78,11 +79,6 @@ const Notify = ({ navigation }) => {
     </View>
   );
 
-  const renderSectionHeader = ({ section }) => (
-    <View style={styles.sectionHeader}>
-      <Text style={styles.sectionHeaderText}>{section.title}</Text>
-    </View>
-  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -110,7 +106,7 @@ const Notify = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: Color.background,
     paddingTop:30
   },
   header: {
@@ -183,6 +179,7 @@ headerTitle: {
   notificationContent: {
     flexDirection: 'row',
     alignItems: 'center',
+     fontFamily: 'AlbertSans-Regular',
   },
   notificationIcon: {
     width: 40,
@@ -200,9 +197,11 @@ headerTitle: {
     fontWeight: '600',
     color: '#000',
     marginBottom: 4,
+    fontFamily: 'AlbertSans-Medium',
   },
   notificationMessage: {
     fontSize: 14,
+    fontFamily: 'AlbertSans-Regular',
     color: '#666',
   },
   timeContainer: {
