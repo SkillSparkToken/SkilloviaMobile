@@ -1,8 +1,4 @@
-
-
-
-
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -14,6 +10,7 @@ import {
   ScrollView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Color } from '../Utils/Theme';
 import Google from '../../assets/Icons/svgs/google';
 
@@ -24,10 +21,27 @@ const Onboarding = ({ navigation }) => {
   const scrollViewRef = useRef(null);
 
   const images = [
+    'https://res.cloudinary.com/dmhvsyzch/image/upload/v1732049206/rsz_0f97c93d7e2a172dfab38a344f9b8ce0_r6frdm_i0xs60.jpg',
     'https://res.cloudinary.com/dmhvsyzch/image/upload/v1732032776/212760ab183179b3b25c4e05722b52ed_rvwdpf.jpg',
-
-    'https://res.cloudinary.com/dmhvsyzch/image/upload/v1732049206/rsz_0f97c93d7e2a172dfab38a344f9b8ce0_r6frdm_i0xs60.jpg'
   ];
+
+  // Check for access token on component mount
+  useEffect(() => {
+    checkAuthToken();
+  }, []);
+
+  const checkAuthToken = async () => {
+    try {
+      const token = await AsyncStorage.getItem('accessToken');
+      if (token) {
+        // Token exists, navigate to home (which contains HomeTabs)
+        navigation.replace('home');
+      }
+    } catch (error) {
+      console.error('Error checking auth token:', error);
+      // Continue with onboarding if there's an error
+    }
+  };
 
   const handleScroll = (event) => {
     const contentOffset = event.nativeEvent.contentOffset;
@@ -57,27 +71,27 @@ const Onboarding = ({ navigation }) => {
               <Text style={styles.title}>Get some shit {'\n'} done!</Text>
 
               {/* Social Login Buttons */}
-              <TouchableOpacity style={[styles.socialButton, styles.facebook]}>
+              {/* <TouchableOpacity style={[styles.socialButton, styles.facebook]}>
                 <Icon name="facebook" size={20} color="#fff" style={styles.icon} />
                 <Text style={styles.socialText}>Continue with Facebook</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
 
               <TouchableOpacity style={[styles.socialButton, styles.google]}>
                 <Google />
                 <Text style={[styles.socialText, styles.googleText]}>Continue with Google</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={[styles.socialButton, styles.apple]}>
+              {/* <TouchableOpacity style={[styles.socialButton, styles.apple]}>
                 <Icon name="apple" size={20} color="#fff" style={styles.icon} />
                 <Text style={styles.socialText}>Continue with Apple</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
 
               <View style={styles.divider}>
                 <Text style={styles.orText}>or</Text>
               </View>
 
               <TouchableOpacity
-                onPress={() => navigation.navigate('welcome')}
+                onPress={() => navigation.navigate('signup')}
                 style={styles.createAccountButton}
               >
                 <Text style={styles.createAccountText}>Create an account</Text>
@@ -134,14 +148,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
-
-
   title: {
     fontSize: 38,
-   
     color: '#fff',
-    width:"100%",
-   
+    width: "100%",
     marginBottom: 20,
     fontFamily: 'AlbertSans-Bold', 
   },
@@ -193,36 +203,31 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     marginBottom: 15,
     alignItems: 'center',
-      fontFamily: 'AlbertSans-Medium',
+    fontFamily: 'AlbertSans-Medium',
   },
   createAccountText: {
     fontSize: 16,
     color: Color.secondary,
-    
     fontFamily: 'AlbertSans-Bold',
   },
   footerText: {
     fontSize: 15,
     color: '#fff',
     marginTop: 20,
-    width:"100%",
-
+    width: "100%",
     fontFamily: 'AlbertSans-Regular',
   },
   loginText: {
-  
     textDecorationLine: 'underline',
-    fontFamily: 'AlbertSans-Medium',
+    fontFamily: 'AlbertSans-Bold',
+    fontSize: 18,
   },
   termsText: {
     fontSize: 12,
     color: '#fff',
-  
     marginTop: 10,
     fontFamily: 'AlbertSans-Light',
   },
-
-
   paginationContainer: {
     flexDirection: 'row',
     position: 'absolute',

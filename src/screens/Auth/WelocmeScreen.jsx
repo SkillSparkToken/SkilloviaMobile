@@ -30,7 +30,7 @@ const WelcomeScreen = ({navigation}) => {
         </View>
 
         {/* Button Positioned Downwards */}
-        <TouchableOpacity onPress={() => navigation.navigate('home')} style={styles.button}>
+        <TouchableOpacity onPress={() => navigation.navigate('login')} style={styles.button}>
           <Text style={styles.buttonText}>Start exploring</Text>
         </TouchableOpacity>
       </View>

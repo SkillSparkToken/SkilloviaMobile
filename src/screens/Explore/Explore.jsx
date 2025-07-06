@@ -1,210 +1,364 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  SafeAreaView,
   View,
   Text,
+  TouchableOpacity,
+  Image,
   FlatList,
   StyleSheet,
-  Image,
-  TouchableOpacity,
-  StatusBar,
-  Animated,
+  ActivityIndicator,
+  Dimensions,
+  Alert,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
+import { useNavigation } from '@react-navigation/native';
+import LinearGradient from 'react-native-linear-gradient';
+import apiClient from '../../Hooks/Api';
 import { Color } from '../../Utils/Theme';
 
-const profiles = [
-  { id: '1', name: 'Sophia Johnson', username: '@sophiaJJ', image: 'https://randomuser.me/api/portraits/women/1.jpg' },
-  { id: '2', name: 'Emily Davis', username: '@davis', image: 'https://randomuser.me/api/portraits/women/2.jpg' },
-  { id: '3', name: 'Oliver Smith', username: '@oliverSmith', image: 'https://randomuser.me/api/portraits/men/1.jpg' },
-  { id: '4', name: 'Ava Brown', username: '@avaBrown', image: 'https://randomuser.me/api/portraits/women/3.jpg' },
-  { id: '5', name: 'Noah Wilson', username: '@WilsonNoah', image: 'https://randomuser.me/api/portraits/men/2.jpg' },
-  { id: '6', name: 'Emma Martinez', username: '@emmaMtz', image: 'https://randomuser.me/api/portraits/women/4.jpg' },
-];
+const { width } = Dimensions.get('window');
 
-const Explore = ({navigation}) => {
-  const [followStates, setFollowStates] = useState(
-    profiles.reduce((acc, profile) => ({
-      ...acc,
-      [profile.id]: {
-        following: false,
-        animation: new Animated.Value(0)
+// Shuffle function
+function shuffleArray(array) {
+  const arr = array.slice();
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+const ExploreSkill = () => {
+  const navigation = useNavigation();
+  const [categories, setCategories] = useState([]);
+  const [isCategoriesLoading, setIsCategoriesLoading] = useState(false);
+  const [categoriesError, setCategoriesError] = useState('');
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    setIsCategoriesLoading(true);
+    setCategoriesError('');
+
+    try {
+      const response = await apiClient.get('/admin/skills/get/published');
+      
+      if (response.data.status === 'success') {
+        setCategories(response.data.data || []);
+      } else {
+        throw new Error(response.data.message || 'Failed to fetch categories');
       }
-    }), {})
+    } catch (err) {
+      console.error('Fetch error:', err);
+      setCategoriesError('Unable to load categories. Please try again later.');
+      Alert.alert('Error', 'Unable to load categories. Please try again later.');
+    } finally {
+      setIsCategoriesLoading(false);
+    }
+  };
+
+  const randomCategories = categories.length > 0 ? shuffleArray(categories).slice(0, 6) : [];
+
+  const gradientColors = [
+    ['#8FF15F', '#1A4D00'],
+
+    ['#1A4D00', '#003333'],
+ 
+    ['#8FF15F', '#2D5016'],
+    ['#FECA57', '#B8860B'],
+  ];
+
+  const navigateToExploreList = (category) => {
+    navigation.navigate('ExploreList', {
+      category: category.title,
+      id: category._id,
+    });
+  };
+
+  const navigateToViewAll = () => {
+    navigation.navigate('ExploreAll');
+  };
+
+  const renderCategoryItem = ({ item, index }) => (
+    <TouchableOpacity
+      style={styles.categoryCard}
+      onPress={() => navigateToExploreList(item)}
+      activeOpacity={0.8}
+    >
+      <LinearGradient
+        colors={[...gradientColors[index % gradientColors.length], '#ffffff']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.gradientBackground}
+      >
+        <View style={styles.imageContainer}>
+          <Image
+            source={{
+              uri: item.thumbnail ||
+                'https://i.pinimg.com/736x/4c/85/31/4c8531dbc05c77cb7a5893297977ac89.jpg'
+            }}
+            style={styles.categoryImage}
+            resizeMode="cover"
+          />
+          <LinearGradient
+            colors={['transparent', 'rgba(0,0,0,0.7)']}
+            style={styles.imageOverlay}
+          >
+            <View style={styles.textContainer}>
+              <Text style={styles.categoryTitle} numberOfLines={1}>
+                {item.title}
+              </Text>
+              <Text style={styles.categoryDescription} numberOfLines={2}>
+                {item.description}
+              </Text>
+            </View>
+          </LinearGradient>
+        </View>
+      </LinearGradient>
+    </TouchableOpacity>
   );
 
-  const handleFollow = (id) => {
-    const newFollowing = !followStates[id].following;
-    
-    // Update state
-    setFollowStates(prevState => ({
-      ...prevState,
-      [id]: {
-        ...prevState[id],
-        following: newFollowing
-      }
-    }));
-
-    // Animate button
-    Animated.sequence([
-      Animated.spring(followStates[id].animation, {
-        toValue: 1.2,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-      Animated.spring(followStates[id].animation, {
-        toValue: 1,
-        duration: 100,
-        useNativeDriver: true,
-      })
-    ]).start();
-  };
-
-  const renderProfile = ({ item }) => {
-    const isFollowing = followStates[item.id].following;
-    const animatedStyle = {
-      transform: [
-        {
-          scale: followStates[item.id].animation.interpolate({
-            inputRange: [0, 1],
-            outputRange: [1, 1]
-          })
-        }
-      ]
-    };
-
-    return (
-      <View style={styles.profileCard}>
-        <Image source={{ uri: item.image }} style={styles.profileImage} />
-        <View style={styles.profileInfo}>
-          <Text style={styles.name}>{item.name}</Text>
-          <Text style={styles.username}>{item.username}</Text>
-        </View>
-        <Animated.View style={animatedStyle}>
-          <TouchableOpacity
-            style={[
-              styles.followButton,
-              isFollowing && styles.followingButton,
-            ]}
-            onPress={() => handleFollow(item.id)}
-          >
-            <Text style={isFollowing ? styles.followingText : styles.followButtonText}>
-              {isFollowing ? 'Following' : 'Follow'}
-            </Text>
-          </TouchableOpacity>
-        </Animated.View>
+  const renderLoadingState = () => (
+    <View style={styles.loadingContainer}>
+      <View style={styles.loadingWrapper}>
+        <ActivityIndicator size="large" color="#3B82F6" />
+        <View style={styles.pulseCircle} />
       </View>
-    );
-  };
+    </View>
+  );
+
+  const renderErrorState = () => (
+    <View style={styles.errorContainer}>
+      <Text style={styles.errorIcon}>⚠️</Text>
+      <Text style={styles.errorText}>{categoriesError}</Text>
+      <TouchableOpacity style={styles.retryButton} onPress={fetchCategories}>
+        <Text style={styles.retryButtonText}>Retry</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+  const renderEmptyState = () => (
+    <View style={styles.emptyContainer}>
+      <Text style={styles.emptyIcon}>📍</Text>
+      <Text style={styles.emptyText}>No categories available.</Text>
+    </View>
+  );
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F9F9F9" />
-      
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity  onPress={() => navigation.goBack()} style={styles.backButton}>
-            <Icon name="arrow-back" size={24} color="#000" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>DIY</Text>
-        </View>
+    <View style={styles.container}>
+      {/* Background gradient decoration */}
+      <LinearGradient
+        colors={['#EBF4FF', '#F3E8FF', '#FDF2F8']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.backgroundGradient}
+      />
 
-        <FlatList
-          data={profiles}
-          keyExtractor={(item) => item.id}
-          renderItem={renderProfile}
-          contentContainerStyle={styles.listContainer}
-          showsVerticalScrollIndicator={false}
-        />
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Explore Skills</Text>
+        <TouchableOpacity 
+          style={styles.viewAllButton} 
+          onPress={navigateToViewAll}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.viewAllText}>View all</Text>
+          <Text style={styles.viewAllIcon}>›</Text>
+        </TouchableOpacity>
       </View>
-    </SafeAreaView>
+
+      {/* Content */}
+      {isCategoriesLoading && renderLoadingState()}
+      
+      {categoriesError && !isCategoriesLoading && renderErrorState()}
+      
+      {!isCategoriesLoading && !categoriesError && (
+        <>
+          {randomCategories.length > 0 ? (
+            <FlatList
+              key="horizontal-flatlist"
+              data={randomCategories}
+              renderItem={renderCategoryItem}
+              keyExtractor={(item) => item._id || item.id}
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.listContainer}
+              ItemSeparatorComponent={() => <View style={styles.separator} />}
+            />
+          ) : (
+            renderEmptyState()
+          )}
+        </>
+      )}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: Color.background,
-  },
   container: {
-    flex: 1,
-    backgroundColor: Color.background,
-    paddingTop: 20
+    marginBottom: 24,
+    position: 'relative',
+  },
+  backgroundGradient: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    opacity: 0.1,
   },
   header: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    color: Color.secondary,
+    marginBottom: 12,
  
-  },
-  backButton: {
-    padding: 8,
+    zIndex: 10,
   },
   headerTitle: {
     fontSize: 18,
-    fontFamily: 'AlbertSans-Bold',
-    marginLeft: 16,
+    fontFamily: 'AlbertSans-Bold', 
     color: Color.secondary,
   },
-  listContainer: {
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 20,
-  },
-  profileCard: {
+  viewAllButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Color.gray,
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-  
+    paddingHorizontal: 8,
+    paddingVertical: 4,
   },
-  profileImage: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    marginRight: 12,
-  },
-  profileInfo: {
-    flex: 1,
-  },
-  name: {
+  viewAllText: {
     fontSize: 16,
-    fontFamily: 'AlbertSans-Bold',
-    color: '#000',
+    fontFamily: 'AlbertSans-Medium', 
+    color: Color.secondary,
   },
-  username: {
-    fontSize: 14,
+  viewAllIcon: {
+    fontSize: 18,
     fontFamily: 'AlbertSans-Medium',
-    color: '#666',
+    color: Color.secondary,
+    marginLeft: 4,
   },
-  followButton: {
-    paddingHorizontal: 20,
-    paddingVertical: 8,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#000',
-    // backgroundColor: '#FFE664',
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 48,
+  },
+  loadingWrapper: {
+    position: 'relative',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  followingButton: {
-    backgroundColor: Color.secondary,
-    borderColor: '#4CAF50',
+  pulseCircle: {
+    position: 'absolute',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#DBEAFE',
+    opacity: 0.2,
   },
-  followButtonText: {
-    fontSize: 14,
-    fontFamily: 'AlbertSans-Medium',
-    color: '#000',
+  errorContainer: {
+    alignItems: 'center',
+    paddingVertical: 32,
+    backgroundColor: '#FEF2F2',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#FECACA',
+    marginHorizontal: 16,
   },
-  followingText: {
-    fontSize: 14,
-    fontFamily: 'AlbertSans-Medium',
+  errorIcon: {
+    fontSize: 32,
+    marginBottom: 8,
+  },
+  errorText: {
+    color: '#DC2626',
+    fontWeight: '500',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  retryButton: {
+    backgroundColor: '#DC2626',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  retryButtonText: {
     color: '#FFFFFF',
+    fontWeight: '500',
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    paddingVertical: 48,
+  },
+  emptyIcon: {
+    fontSize: 48,
+    marginBottom: 16,
+    opacity: 0.3,
+  },
+  emptyText: {
+    fontSize: 18,
+    fontWeight: '500',
+    color: '#6B7280',
+  },
+  listContainer: {
+    // paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  separator: {
+    width: 16,
+  },
+  categoryCard: {
+    width: width * 0.60, 
+    borderRadius: 16,
+    overflow: 'hidden',
+
+  },
+  gradientBackground: {
+    padding: 4,
+    borderRadius: 16,
+  },
+  imageContainer: {
+    width: '100%',
+    height: 180,
+    borderRadius: 12,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  categoryImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 12,
+  },
+  imageOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: '80%',
+    justifyContent: 'flex-end',
+  },
+  textContainer: {
+    padding: 16,
+  },
+  categoryTitle: {
+    fontSize: 18,
+    fontFamily: 'AlbertSans-Medium', 
+    color: '#FFFFFF',
+    textTransform: 'capitalize',
+    marginBottom: 4,
+    textShadowColor: 'rgba(0, 0, 0, 0.7)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
+  },
+  categoryDescription: {
+    fontSize: 13,
+    fontFamily: 'AlbertSans-Regular', 
+    color: '#FFFFFF',
+    textTransform: 'capitalize',
+    textShadowColor: 'rgba(0, 0, 0, 0.7)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
+    lineHeight: 18,
   },
 });
 
-export default Explore;
+export default ExploreSkill;

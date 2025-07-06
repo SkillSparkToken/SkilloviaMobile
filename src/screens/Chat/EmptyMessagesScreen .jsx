@@ -1,16 +1,25 @@
 // src/screens/EmptyMessagesScreen.js
 import React from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const EmptyMessagesScreen = () => {
   return (
     <View style={styles.container}>
-      <Image
-        source={{ uri: "" }}
-        style={styles.emptyImage}
-      />
+      <View style={styles.iconContainer}>
+        <Icon 
+          name="chatbubbles-outline" 
+          size={70} 
+          color={'#333'}
+      
+        />
+      </View>
+      
       <Text style={styles.emptyText}>Nothing to see here!</Text>
       <Text style={styles.subText}>You have no messages</Text>
+      <Text style={styles.hintText}>
+        Start a conversation to see your messages here
+      </Text>
     </View>
   );
 };
@@ -20,22 +29,37 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    // backgroundColor: '#fff',
+    paddingHorizontal: 40,
   },
-  emptyImage: {
-    width: 100,
-    height: 100,
-    marginBottom: 20,
-    tintColor: '#4CAF50', // Green color matching the chat bubbles
+  iconContainer: {
+  paddingTop: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 30,
+  
   },
   emptyText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    fontSize: 24,
+  
+    color: '#333',
+    marginBottom: 8,
+    textAlign: 'center',
+    fontFamily: 'AlbertSans-Medium',
   },
   subText: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#666',
+    marginBottom: 12,
+    textAlign: 'center',
+    fontFamily: 'AlbertSans-Medium',
+  },
+  hintText: {
+    fontSize: 14,
+    color: '#999',
+    textAlign: 'center',
+    lineHeight: 20,
+    fontFamily: 'AlbertSans-Regular',
   },
 });
 
