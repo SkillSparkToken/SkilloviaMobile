@@ -9,27 +9,32 @@ const SettingsScreen = ({ navigation }) => {
     {
       title: "My Skillovia",
       data: [
-        { title: "My skills", icon: "book", route: "empty" },
+        { title: "My skills", icon: "book", route: "myskill" },
         { title: "Edit profile", icon: "person", route: "editprofile" },
         { title: "KYC", icon: "id-card", route: "kyclist" },
-        { title: "Invite friends", icon: "share-social", route: "InviteFriends" },
+        { title: "Invite friends", icon: "share-social", route: "invite" },
+ 
+        { title: "Fund account", icon: "wallet", route: "Fund" },
+        { title: "Link Stripe", icon: "link", route: "stripe-setup" },
+  
+        
       ],
     },
     {
       title: "General",
       data: [
         { title: "Security", icon: "shield-checkmark", route: "security" },
-        { title: "Payment settings", icon: "card", route: "PaymentSettings" },
+        { title: "Payment settings", icon: "card", route: "payment" },
         { title: "Notifications settings", icon: "notifications", route: "notification" },
-        { title: "Linked Devices", icon: "laptop", route: "LinkedDevices" },
-        { title: "Appearance", icon: "color-palette", route: "appearance" },
+        // { title: "Linked Devices", icon: "laptop", route: "LinkedDevices" },
+        // { title: "Appearance", icon: "color-palette", route: "appearance" },
       ],
     },
     {
       title: "Legal & Support",
       data: [
-        { title: "Terms of Service", icon: "document-text", route: "TermsOfService" },
-        { title: "Privacy Policy", icon: "lock-closed", route: "PrivacyPolicy" },
+        { title: "Terms of Service", icon: "document-text", route: "terms" },
+        { title: "Privacy Policy", icon: "lock-closed", route: "policy" },
         { title: "Help Center", icon: "help-circle", route: "HelpCenter" },
       ],
     },
@@ -37,7 +42,7 @@ const SettingsScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <StatusBar translucent={true} barStyle="dark-content" hidden={false} />
+      {/* <StatusBar translucent={true} barStyle="dark-content" hidden={false} /> */}
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.headerContainer}>
         <View style={styles.backButton}>
           <Icon name="arrow-back" size={24} color="#000" />
@@ -51,7 +56,7 @@ const SettingsScreen = ({ navigation }) => {
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.item}
-            onPress={() => navigation.navigate(item.route)} // Navigate to the route
+            onPress={() => navigation.navigate(item.route)}
           >
             <Icon name={item.icon} size={20} color="#6B7280" style={styles.icon} />
             <Text style={styles.itemText}>{item.title}</Text>
@@ -71,7 +76,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Color.background,
-    paddingTop: 50,
+    paddingTop: 10,
   },
   headerContainer: {
     flexDirection: "row", 

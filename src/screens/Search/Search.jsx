@@ -1,160 +1,404 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
+  Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
   FlatList,
-  Text,
-  StatusBar,
-  Platform,
+  Image,
+  StyleSheet,
+  ActivityIndicator,
+  Alert,
+  SafeAreaView,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
-import { Color } from '../../Utils/Theme';
+import Icon from 'react-native-vector-icons/Feather';
+import apiClient from '../../Hooks/Api';
+import { Color } from "../../Utils/Theme";
 
-// Dummy data for suggestions
-const DUMMY_DATA = [
-  // People
-  { id: '1', name: 'John Developer', type: 'person', skills: 'React Native, JavaScript' },
-  { id: '2', name: 'Sarah Designer', type: 'person', skills: 'UI/UX, Figma' },
-  { id: '3', name: 'Mike Handler', type: 'person', skills: 'Electrical Repairs, Carpentry' },
-  { id: '4', name: 'Tom Cleaner', type: 'person', skills: 'House Cleaning, Deep Cleaning' },
-  
-  // Communities
-  { id: '5', name: 'Home Improvement Pros', type: 'community', members: '8.2k members' },
-  { id: '6', name: 'Professional Cleaners Network', type: 'community', members: '4.5k members' },
-  { id: '7', name: 'Handyman Hub', type: 'community', members: '6.1k members' },
-  
-  // Skills
-  { id: '8', name: 'Electrical Repairs', type: 'skill', people: '2.5k+ people' },
-  { id: '9', name: 'Carpentry', type: 'skill', people: '3k+ people' },
-  { id: '10', name: 'Painting (Interior/Exterior)', type: 'skill', people: '4.2k+ people' },
-  { id: '11', name: 'Appliance Repair', type: 'skill', people: '1.8k+ people' },
-  { id: '12', name: 'Furniture Assembly', type: 'skill', people: '2.3k+ people' },
-  { id: '13', name: 'Handyman Services', type: 'skill', people: '5k+ people' },
-  { id: '14', name: 'Lock Repair and Locksmith Services', type: 'skill', people: '1.2k+ people' },
-  { id: '15', name: 'Roofing Repairs', type: 'skill', people: '1.5k+ people' },
-  { id: '16', name: 'Window and Glass Repair', type: 'skill', people: '1.3k+ people' },
-  { id: '17', name: 'House Cleaning', type: 'skill', people: '6.8k+ people' },
-  { id: '18', name: 'Deep Cleaning', type: 'skill', people: '4.2k+ people' },
-  { id: '19', name: 'Carpet Cleaning', type: 'skill', people: '2.1k+ people' },
-  { id: '20', name: 'Gutter Cleaning', type: 'skill', people: '1.7k+ people' },
-  { id: '21', name: 'Pressure Washing', type: 'skill', people: '2.4k+ people' },
-  { id: '22', name: 'Pool Cleaning and Maintenance', type: 'skill', people: '1.9k+ people' },
-  { id: '23', name: 'Garage Organization', type: 'skill', people: '1.6k+ people' },
-  { id: '24', name: 'Decluttering Services', type: 'skill', people: '2.2k+ people' },
-  { id: '25', name: 'Chimney Sweeping', type: 'skill', people: '900+ people' },
-];
-
-const SearchScreen = () => {
+const UserSearch = () => {
   const navigation = useNavigation();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [suggestions, setSuggestions] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [users, setUsers] = useState([]);
+  const [skills, setSkills] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSkillLoading, setIsSkillLoading] = useState(false);
+  
+  // New state for search history
+  const [searchHistory, setSearchHistory] = useState([]);
+  const [showHistory, setShowHistory] = useState(false);
 
-  const handleSearch = useCallback((text) => {
-    setSearchQuery(text);
-    if (text.trim() === '') {
-      setSuggestions([]);
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      if (searchTerm.length >= 3) {
+        searchUser();
+        searchSkill();
+        setShowHistory(false);
+      }
+      if (searchTerm.length === 0) {
+        setUsers([]);
+        setSkills([]);
+        setShowHistory(true); // Show history when search is empty
+      }
+    }, 300);
+
+    return () => clearTimeout(debounceTimer);
+  }, [searchTerm]);
+
+  const searchUser = async () => {
+    if (searchTerm.length < 3) return;
+
+    setIsLoading(true);
+    try {
+      const normalizedSearchTerm = searchTerm.toLowerCase().trim();
+      
+      const response = await apiClient.get(`/users/searchuser/${normalizedSearchTerm}`);
+      
+      if (response.data.status === 'success') {
+        const matchingUsers = Array.isArray(response.data.data)
+          ? response.data.data
+          : [response.data.data];
+        setUsers(matchingUsers);
+      } else {
+        setUsers([]);
+      }
+    } catch (error) {
+      console.error('Error searching user:', error);
+      setUsers([]);
+    }
+    setIsLoading(false);
+  };
+
+  const searchSkill = async () => {
+    if (searchTerm.length < 3) return;
+    setIsSkillLoading(true);
+
+    try {
+      const normalizedSearchTerm = searchTerm.toLowerCase().trim();
+      
+      const response = await apiClient.get(`/skills/searchname/${normalizedSearchTerm}`);
+      
+      if (response.data.status === 'success' && Array.isArray(response.data.data)) {
+        setSkills(response.data.data);
+      } else {
+        setSkills([]);
+      }
+    } catch (error) {
+      console.error('Error searching skill:', error);
+      setSkills([]);
+    }
+    setIsSkillLoading(false);
+  };
+
+  const handleUserClick = (userId) => {
+    if (!userId) {
+      Alert.alert('Error', 'Invalid user ID.');
       return;
     }
+    navigation.navigate('UserProfile', { userId });
+  };
 
-    // Filter suggestions based on search query
-    const filteredSuggestions = DUMMY_DATA.filter((item) =>
-      item.name.toLowerCase().includes(text.toLowerCase()) ||
-      (item.type === 'person' && item.skills.toLowerCase().includes(text.toLowerCase()))
-    );
-    setSuggestions(filteredSuggestions);
-  }, []);
+  const handleSkillClick = (skill) => {
+    navigation.navigate('ExploreList', {
+      id: skill._id,
+      category: skill.title,
+    });
+  };
 
-  const renderSuggestionItem = ({ item }) => (
+  // Function to add search result to history
+  const addToHistory = (item, type) => {
+    const historyItem = {
+      ...item,
+      type: type,
+      searchedAt: new Date().toISOString(),
+      id: `${type}_${item._id}_${Date.now()}` // Unique ID for history
+    };
+
+    setSearchHistory(prev => {
+      // Remove if already exists to avoid duplicates
+      const filtered = prev.filter(historyItem => 
+        !(historyItem._id === item._id && historyItem.type === type)
+      );
+      // Add to beginning and limit to 20 items
+      return [historyItem, ...filtered].slice(0, 20);
+    });
+  };
+
+  // Enhanced click handlers that add to history
+  const handleUserClickWithHistory = (user) => {
+    addToHistory(user, 'user');
+    handleUserClick(user._id);
+  };
+
+  const handleSkillClickWithHistory = (skill) => {
+    addToHistory(skill, 'skill');
+    handleSkillClick(skill);
+  };
+
+  // Function to handle clicking on history items
+  const handleHistoryClick = (item) => {
+    if (item.type === 'user') {
+      handleUserClick(item._id);
+    } else if (item.type === 'skill') {
+      handleSkillClick(item);
+    }
+  };
+
+  const clearSearch = () => {
+    setSearchTerm('');
+    setUsers([]);
+    setSkills([]);
+    setShowHistory(true);
+  };
+
+  const clearHistory = () => {
+    setSearchHistory([]);
+  };
+
+  const removeFromHistory = (itemId) => {
+    setSearchHistory(prev => prev.filter(item => item.id !== itemId));
+  };
+
+  const renderSkillItem = ({ item, index }) => (
     <TouchableOpacity
-      style={styles.suggestionItem}
-      onPress={() => {
-        // Handle suggestion selection
-        console.log('Selected:', item);
-      }}
+      key={item._id || index}
+      style={styles.resultItem}
+      onPress={() => handleSkillClickWithHistory(item)}
     >
-      <View style={styles.suggestionContent}>
-        <Icon
-          name={
-            item.type === 'person'
-              ? 'person-outline'
-              : item.type === 'community'
-              ? 'people-outline'
-              : 'build-outline'  
-          }
-          size={24}
-          color="#6B7280"
-          style={styles.suggestionIcon}
-        />
-        <View>
-          <Text style={styles.suggestionTitle}>{item.name}</Text>
-          <Text style={styles.suggestionSubtitle}>
-            {item.type === 'person'
-              ? item.skills
-              : item.type === 'community'
-              ? item.members
-              : item.people}
-          </Text>
-        </View>
+      <View style={styles.avatarContainer}>
+        {item.thumbnail ? (
+          <Image
+            source={{ uri: item.thumbnail }}
+            style={styles.skillAvatar}
+            resizeMode="cover"
+          />
+        ) : (
+          <View style={[styles.skillAvatar, styles.placeholderAvatar]}>
+            <Text style={styles.placeholderText}>SKILL</Text>
+          </View>
+        )}
+      </View>
+      <View style={styles.itemContent}>
+        <Text style={styles.itemTitle}>{item.title}</Text>
+        <Text style={styles.itemSubtitle}>{item.description}</Text>
       </View>
     </TouchableOpacity>
   );
 
-  return (
-    <>
-      <StatusBar
-        barStyle="dark-content"
-        backgroundColor="#FFFFFF"
-        translucent={Platform.OS === 'android'}
-      />
-      <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}
-          >
-            <Icon name="arrow-back" size={24} color="#1F2937" />
-         
-          </TouchableOpacity>
+  const renderUserItem = ({ item, index }) => (
+    <TouchableOpacity
+      key={item._id || index}
+      style={styles.resultItem}
+      onPress={() => handleUserClickWithHistory(item)}
+    >
+      <View style={styles.avatarContainer}>
+        <Image
+          source={{
+            uri: item.photourl || 
+              'https://i.pinimg.com/736x/4c/85/31/4c8531dbc05c77cb7a5893297977ac89.jpg'
+          }}
+          style={styles.userAvatar}
+          resizeMode="cover"
+        />
+      </View>
+      <View style={styles.itemContent}>
+        <Text style={styles.itemTitle}>
+          {`${item.firstname} ${item.lastname}`}
+        </Text>
+        <Text style={styles.itemSubtitle}>{item.email}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+
+  const renderHistoryItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.historyItem}
+      onPress={() => handleHistoryClick(item)}
+    >
+      <View style={styles.historyItemContent}>
+        <View style={styles.avatarContainer}>
+          {item.type === 'user' ? (
+            <Image
+              source={{
+                uri: item.photourl || 
+                  'https://i.pinimg.com/736x/4c/85/31/4c8531dbc05c77cb7a5893297977ac89.jpg'
+              }}
+              style={styles.userAvatar}
+              resizeMode="cover"
+            />
+          ) : (
+            item.thumbnail ? (
+              <Image
+                source={{ uri: item.thumbnail }}
+                style={styles.skillAvatar}
+                resizeMode="cover"
+              />
+            ) : (
+              <View style={[styles.skillAvatar, styles.placeholderAvatar]}>
+                <Text style={styles.placeholderText}>SKILL</Text>
+              </View>
+            )
+          )}
         </View>
+        <View style={styles.itemContent}>
+          <Text style={styles.itemTitle}>
+            {item.type === 'user' 
+              ? `${item.firstname} ${item.lastname}`
+              : item.title
+            }
+          </Text>
+          <Text style={styles.itemSubtitle}>
+            {item.type === 'user' ? item.email : item.description}
+          </Text>
+        </View>
+        <View style={styles.historyMeta}>
+          <Text style={styles.historyType}>
+            {item.type.toUpperCase()}
+          </Text>
+        </View>
+      </View>
+      <TouchableOpacity
+        style={styles.removeButton}
+        onPress={() => removeFromHistory(item.id)}
+      >
+        <Icon name="x" size={16} color="#9CA3AF" />
+      </TouchableOpacity>
+    </TouchableOpacity>
+  );
+
+  const renderLoadingIndicator = () => (
+    <View style={styles.loadingContainer}>
+      <ActivityIndicator size="small" color="#6B7280" />
+      <Text style={styles.loadingText}>Searching...</Text>
+    </View>
+  );
+
+  const renderEmptyState = () => {
+    if (searchTerm.length < 3 && searchTerm.length > 0) {
+      return (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyTitle}>Keep typing...</Text>
+          <Text style={styles.emptySubtitle}>At least 3 characters needed</Text>
+        </View>
+      );
+    }
+
+    if (searchTerm.length >= 3 && users.length === 0 && skills.length === 0) {
+      return (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyTitle}>No users or skills found</Text>
+          <Text style={styles.emptySubtitle}>Try a different search term</Text>
+        </View>
+      );
+    }
+
+    return null;
+  };
+
+  const renderHistoryHeader = () => (
+    <View style={styles.historyHeader}>
+      <Text style={styles.historyTitle}>Recent Searches</Text>
+      {searchHistory.length > 0 && (
+        <TouchableOpacity onPress={clearHistory}>
+          <Text style={styles.clearHistoryText}>Clear All</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+
+  return (
+    <SafeAreaView style={styles.container}>
+      {/* Header with search input */}
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Icon name="arrow-left" size={24} color="#374151" />
+        </TouchableOpacity>
         
         <View style={styles.searchContainer}>
-            
-          <View style={styles.searchWrapper}>
-            <Icon name="search-outline" size={20} color="#6B7280" />
+          <View style={styles.searchInputContainer}>
+            <Icon name="search" size={18} color="#9CA3AF" style={styles.searchIcon} />
             <TextInput
               style={styles.searchInput}
-              placeholder="Search people, skills and communities"
-              placeholderTextColor="#6B7280"
-              autoFocus={true}
-              value={searchQuery}
-              onChangeText={handleSearch}
+              value={searchTerm}
+              onChangeText={setSearchTerm}
+              placeholder="Search users, Skills..."
+              placeholderTextColor="#9CA3AF"
+              returnKeyType="search"
+              onSubmitEditing={() => {
+                searchUser();
+                searchSkill();
+              }}
             />
-            {searchQuery.length > 0 && (
-              <TouchableOpacity
-                onPress={() => {
-                  setSearchQuery('');
-                  setSuggestions([]);
-                }}
-              >
-                <Icon name="close-circle" size={20} color="#6B7280" />
+            {searchTerm ? (
+              <TouchableOpacity onPress={clearSearch} style={styles.clearButton}>
+                <Icon name="x" size={16} color="#6B7280" />
               </TouchableOpacity>
-            )}
+            ) : null}
           </View>
         </View>
+      </View>
 
+      {/* Loading indicator */}
+      {(isLoading || isSkillLoading) && renderLoadingIndicator()}
+
+      {/* Show search history when no active search */}
+      {showHistory && searchHistory.length > 0 && (
+        <View style={styles.historyContainer}>
+          {renderHistoryHeader()}
+          <FlatList
+            data={searchHistory}
+            renderItem={renderHistoryItem}
+            keyExtractor={(item) => item.id}
+            showsVerticalScrollIndicator={false}
+            style={styles.historyList}
+          />
+        </View>
+      )}
+
+      {/* Show empty state for history */}
+      {showHistory && searchHistory.length === 0 && (
+        <View style={styles.emptyContainer}>
+          <Icon name="clock" size={48} color="#D1D5DB" />
+          <Text style={styles.emptyTitle}>No recent searches</Text>
+          <Text style={styles.emptySubtitle}>Your search history will appear here</Text>
+        </View>
+      )}
+
+      {/* Results */}
+      {!showHistory && (
         <FlatList
-          data={suggestions}
-          renderItem={renderSuggestionItem}
-          keyExtractor={(item) => item.id}
-          keyboardShouldPersistTaps="always"
-          contentContainerStyle={styles.suggestionsContainer}
+          style={styles.resultsList}
+          keyExtractor={(item, index) => item._id || index.toString()}
+          data={[
+            // Skills section
+            ...(skills.length > 0 ? [{ type: 'section', title: 'Skills' }] : []),
+            ...skills.map(skill => ({ ...skill, type: 'skill' })),
+            // Users section
+            ...(users.length > 0 ? [{ type: 'section', title: 'Users' }] : []),
+            ...users.map(user => ({ ...user, type: 'user' })),
+          ]}
+          renderItem={({ item, index }) => {
+            if (item.type === 'section') {
+              return (
+                <View style={styles.sectionHeader}>
+                  <Text style={styles.sectionTitle}>{item.title}</Text>
+                </View>
+              );
+            } else if (item.type === 'skill') {
+              return renderSkillItem({ item, index });
+            } else if (item.type === 'user') {
+              return renderUserItem({ item, index });
+            }
+            return null;
+          }}
+          ListEmptyComponent={!isLoading && !isSkillLoading ? renderEmptyState : null}
+          showsVerticalScrollIndicator={false}
         />
-      </SafeAreaView>
-    </>
+      )}
+    </SafeAreaView>
   );
 };
 
@@ -162,76 +406,190 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Color.background,
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
-    fontFamily: 'AlbertSans-Regular',
+    paddingTop: 20,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    paddingBottom: 8,
-    fontFamily: 'AlbertSans-Regular',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: '#F6FCEB',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
   },
   backButton: {
     padding: 8,
-    flexDirection: 'row',
+    marginRight: 8,
   },
   searchContainer: {
-    paddingHorizontal: 16,
-    paddingBottom: 8,
+    flex: 1,
   },
-  searchWrapper: {
+  searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    // backgroundColor: '#F3F4F6',
-    borderRadius: 30,
-    borderWidth:1,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderColor: '#D3D3D3',
+    borderRadius: 25,
+    borderWidth: 1,
+    borderColor: Color.gray,
+    paddingHorizontal: 16,
+    paddingVertical: 3,
+  },
+  searchIcon: {
+    marginRight: 8,
   },
   searchInput: {
     flex: 1,
-    marginLeft: 8,
-    marginRight: 8,
     fontSize: 16,
-    color: '#1F2937',
-    fontFamily: 'AlbertSans-Regular',
-
+    color: '#374151',
   },
-
-  texx: {
-    marginLeft: 10,
-    fontSize: 14,
-    color: '#1F2937',
+  clearButton: {
+    padding: 4,
+    marginLeft: 8,
+  },
+  loadingContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 32,
+  },
+  loadingText: {
+    marginLeft: 8,
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#6B7280',
+  },
+  resultsList: {
+    flex: 1,
+    paddingHorizontal: 16,
+  },
+  sectionHeader: {
+    paddingVertical: 8,
+    paddingHorizontal: 8,
+  },
+  sectionTitle: {
+    fontSize: 12,
+    fontFamily: 'AlbertSans-Medium',
+    color: '#6B7280',
+    textTransform: 'uppercase',
+  },
+  resultItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Color.inputbg,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
+    padding: 16,
+    marginVertical: 4,
+  },
+  avatarContainer: {
+    marginRight: 12,
+  },
+  userAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  skillAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  placeholderAvatar: {
+    backgroundColor: '#E5E7EB',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  placeholderText: {
+    fontSize: 10,
+    color: '#9CA3AF',
     fontFamily: 'AlbertSans-Medium',
   },
-  suggestionsContainer: {
+  itemContent: {
+    flex: 1,
+  },
+  itemTitle: {
+    fontSize: 12,
+    fontFamily: 'AlbertSans-Medium',
+    color: '#111827',
+    marginBottom: 2,
+  },
+  itemSubtitle: {
+    fontSize: 12,
+    color: '#6B7280',
+    fontFamily: 'AlbertSans-Medium',
+  },
+  emptyContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 64,
+  },
+  emptyTitle: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#6B7280',
+    marginBottom: 4,
+  },
+  emptySubtitle: {
+    fontSize: 14,
+    color: '#9CA3AF',
+  },
+  // New styles for history
+  historyContainer: {
+    flex: 1,
+    paddingHorizontal: 16,
+  },
+  historyHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 8,
+  },
+  historyTitle: {
+    fontSize: 18,
+    fontFamily: 'AlbertSans-Medium',
+    color: '#111827',
+  },
+  clearHistoryText: {
+    fontSize: 14,
+    color: '#6B7280',
+    fontFamily: 'AlbertSans-Medium',
+  },
+  historyList: {
+    flex: 1,
+  },
+  historyItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Color.inputbg,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    borderRadius: 12,
     padding: 16,
+    marginVertical: 4,
   },
-  suggestionItem: {
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
-  },
-  suggestionContent: {
+  historyItemContent: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
   },
-  suggestionIcon: {
-    marginRight: 12,
+  historyMeta: {
+    marginLeft: 'auto',
+    marginRight: 8,
   },
-  suggestionTitle: {
-    fontSize: 16,
-    color: '#1F2937',
-    fontFamily: 'AlbertSans-Regular',
+  historyType: {
+    fontSize: 10,
+    color: '#9CA3AF',
+    fontFamily: 'AlbertSans-Medium',
   },
-  suggestionSubtitle: {
-    fontSize: 14,
-    color: '#6B7280',
-    fontFamily: 'AlbertSans-Regular',
-    marginTop: 2,
+  removeButton: {
+    padding: 4,
+    marginLeft: 8,
   },
 });
 
-export default SearchScreen;
+export default UserSearch;

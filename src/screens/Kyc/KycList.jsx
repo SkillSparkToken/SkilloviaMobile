@@ -12,14 +12,16 @@ const KYCList = ({ navigation }) => {
       icon: 'mail-outline',
       status: 'checkmark-circle',
       color: '#4CAF50',
+      screen: 'EmailVerification', // Separate screen for email verification
     },
     {
       id: '2',
       title: 'Identification',
       description: 'A valid legal document to identify you',
       icon: 'card-outline',
-      status: 'information-circle',
-      color: '#FFC107',
+      status: 'arrow-forward-circle',
+      color: '#9E9E9E',
+      screen: 'id', // Separate screen for ID upload
     },
     {
       id: '3',
@@ -28,8 +30,16 @@ const KYCList = ({ navigation }) => {
       icon: 'document-text-outline',
       status: 'arrow-forward-circle',
       color: '#9E9E9E',
+      screen: 'UtilityBillUpload', // Separate screen for utility bill upload
     },
   ];
+
+  const handleOptionPress = (option) => {
+    navigation.navigate(option.screen, { 
+      id: option.id, 
+      title: option.title 
+    });
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -50,7 +60,7 @@ const KYCList = ({ navigation }) => {
           <TouchableOpacity
             key={option.id}
             style={styles.card}
-            onPress={() => navigation.navigate('id', { id: option.id, title: option.title })}
+            onPress={() => handleOptionPress(option)}
           >
             <View style={styles.iconContainer}>
               <Icon name={option.icon} size={24} color="#000" />
@@ -78,14 +88,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 40,
-    marginTop:25
+    marginTop: 25
   },
   header: {
     fontSize: 24,
     fontFamily: 'AlbertSans-Bold',
     color: '#000',
     marginLeft: 10,
-
   },
   subtitle: {
     fontSize: 14,
@@ -108,8 +117,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#DDD',
-    marginVertical:10,
-    paddingVertical:20
+    marginVertical: 10,
+    paddingVertical: 20
   },
   iconContainer: {
     marginRight: 15,

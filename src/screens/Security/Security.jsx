@@ -44,7 +44,7 @@ const SecurityScreen = ({navigation}) => {
       </View>
 
       {/* Face or Fingerprint Recognition Option */}
-      <View style={styles.option}>
+      {/* <View style={styles.option}>
         <View style={styles.optionLeft}>
           <Icon name="checkmark-circle" size={20} color="#32CD32" />
           <View style={styles.optionTextContainer}>
@@ -61,7 +61,7 @@ const SecurityScreen = ({navigation}) => {
           trackColor={{ false: '#DDD', true: '#32CD32' }}
           thumbColor="#FFF"
         />
-      </View>
+      </View> */}
     </View>
   );
 };

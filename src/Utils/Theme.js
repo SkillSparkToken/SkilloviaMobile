@@ -8,5 +8,7 @@ export const Color = {
     gray: '#EAF0E0', 
     text: '#171D14',
     verify: '#246868',
+    error: '#DC3545',
+    inputbg: '#f0f6e6',
     
 }

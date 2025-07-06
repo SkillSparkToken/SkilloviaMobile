@@ -1,140 +1,345 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  SafeAreaView,
   View,
   Text,
-  StatusBar,
+  ScrollView,
   TouchableOpacity,
+  Alert,
+  ActivityIndicator,
   StyleSheet,
-  Image,
+  SafeAreaView,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import BookingCard from '../BookingCard';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/Feather';
+import BookCard from '../BookingCard'; 
+import apiClient from '../../../Hooks/Api';
 import { Color } from '../../../Utils/Theme';
-import OrderCompletionSheet from '../OrderCompletion';
 
 
+const OutwardProgress = () => {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const { id } = route.params; // Get id from route params instead of useParams
+  
+  const [bookingDetails, setBookingDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
 
-const BookingProgress = ({navigation}) => {
+      try {
+        const bookingResponse = await apiClient.get('/bookings/get/user/outward');
 
-  const [isVisible, setIsVisible] = useState(false);
-  const handleOpenSheet = () => {
-    setIsVisible(true);
-  }
+        if (!bookingResponse.data) {
+          throw new Error('Failed to fetch booking details');
+        }
 
-// Then in your render:
-
-
-  const bookingSteps = [
-    {
-      title: 'Service completed',
-      date: 'April 19, 2012 3:30 PM',
-      status: 'empty',
-    },
-    {
-      title: 'Service in progress',
-      date: 'March 11, 2016 11:03 PM',
-      status: 'empty',
-    },
-    {
-      title: 'Booking request confirmed',
-      date: 'November 19, 2012 4:50 AM',
-      status: 'completed',
-    },
-    {
-      title: 'Booking request sent',
-      date: 'November 19, 2012 4:50 AM',
-      status: 'completed',
-    },
-    {
-      title: 'Payment confirmed',
-      date: 'November 19, 2012 4:50 AM',
-      status: 'completed',
-    },
-  ];
-
-  const renderStepIcon = (status) => {
-    switch (status) {
-      case 'completed':
-        return (
-          <View style={styles.completedDot}>
-            <Icon name="check-circle" size={24} color="#1A4D00" />
-          </View>
+        const bookingData = bookingResponse.data;
+        const booking = bookingData.data.find(
+          (booking) => booking.id === id // compare with string id directly
         );
-      case 'empty':
-      default:
-        return (
-          <View style={styles.emptyDot}>
-            <View style={styles.innerCircle} />
-          </View>
-        );
+        
+        if (!booking) {
+          throw new Error('Booking not found');
+        }
+
+        setBookingDetails(booking);
+      } catch (err) {
+        setError(err.message || 'An error occurred while fetching data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchData();
+    }
+  }, [id]);
+
+  const handleBookingAction = async (action) => {
+    setIsProcessing(true);
+
+    try {
+      const response = await apiClient.put(`/bookings/${action}/${id}`);
+
+      if (!response.data) {
+        throw new Error(`Failed to ${action} booking`);
+      }
+
+      // Update local booking status
+      setBookingDetails((prev) => ({
+        ...prev,
+        status:
+          action === 'accept'
+            ? 'accepted'
+            : action === 'in-progress'
+            ? 'in_progress'
+            : 'completed',
+      }));
+
+      // Show success message and redirect
+      const actionVerb =
+        action === 'in-progress'
+          ? 'started'
+          : action === 'complete'
+          ? 'completed'
+          : 'accepted';
+      
+      Alert.alert('Success', `Booking ${actionVerb} successfully`);
+
+      if (action === 'complete') {
+        navigation.navigate('Bookings'); // Adjust screen name as needed
+      }
+    } catch (err) {
+      setError(`Error with booking action: ${err.message}`);
+      Alert.alert('Error', `Failed to ${action} booking`);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
-  return (
-    <>
-      <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
+  const handleOpenDispute = () => {
+    // Navigate to the dispute screen with booking data
+    if (bookingDetails) {
+      navigation.navigate('OpenDispute', {
+        bookingId: bookingDetails.id,
+        bookedUserId: bookingDetails.booked_user_id,
+        bookingTitle: bookingDetails.title,
+        description: bookingDetails.description,
+      });
+    } else {
+      Alert.alert('Error', 'Cannot open dispute: Missing booking information');
+    }
+  };
+
+  const getTimelineData = (status) => {
+    // Define status check logic
+    const statusChecks = {
+      pending: 1,
+      accepted: 2,
+      in_progress: 3,
+      completed: 4,
+      disputed: 4,
+    };
+
+    const currentStep = statusChecks[status] || 0;
+
+    return [
+      {
+        status: 'Booking request sent',
+        timestamp: bookingDetails?.createdAt
+          ? new Date(bookingDetails.createdAt).toLocaleString()
+          : '-',
+        hasCheck: currentStep >= 1,
+      },
+      {
+        status: 'Booking request confirmed',
+        timestamp: bookingDetails?.updatedAt
+          ? new Date(bookingDetails.updatedAt).toLocaleString()
+          : '-',
+        hasCheck: currentStep >= 2,
+      },
+      {
+        status: 'Payment confirmed',
+        timestamp: bookingDetails?.updatedAt
+          ? new Date(bookingDetails.updatedAt).toLocaleString()
+          : '-',
+        hasCheck: currentStep >= 2,
+      },
+      {
+        status: 'Service in progress',
+        timestamp: bookingDetails?.booking_date
+          ? new Date(bookingDetails.booking_date).toLocaleString()
+          : '-',
+        hasCheck: currentStep >= 3,
+      },
+      {
+        status: 'Service completed',
+        timestamp: bookingDetails?.updatedAt
+          ? new Date(bookingDetails.updatedAt).toLocaleString()
+          : '-',
+        hasCheck: currentStep >= 4,
+      },
+    ];
+  };
+
+  const renderActionButton = () => {
+    if (!bookingDetails) return null;
+
+    switch (bookingDetails.status) {
+      case 'pending':
+        return (
+          <TouchableOpacity
+            disabled={true}
+            style={[styles.actionButton, styles.disabledButton]}
+          >
+            <Text style={styles.disabledButtonText}>
+              Start Service (Awaiting Acceptance)
+            </Text>
+          </TouchableOpacity>
+        );
+      case 'accepted':
+        return (
+          <TouchableOpacity
+            onPress={() => handleBookingAction('in-progress')}
+            disabled={isProcessing}
+            style={[
+              styles.actionButton,
+              styles.primaryButton,
+              isProcessing && styles.processingButton,
+            ]}
+          >
+            <Text style={styles.primaryButtonText}>Start Service</Text>
+          </TouchableOpacity>
+        );
+      case 'in_progress':
+        return (
+          <TouchableOpacity
+            onPress={() => handleBookingAction('complete')}
+            disabled={isProcessing}
+            style={[
+              styles.actionButton,
+              styles.successButton,
+              isProcessing && styles.processingButton,
+            ]}
+          >
+            <Text style={styles.successButtonText}>Complete Service</Text>
+          </TouchableOpacity>
+        );
+      case 'completed':
+        return (
+          <TouchableOpacity disabled={true} style={[styles.actionButton, styles.disabledButton]}>
+            <Text style={styles.disabledButtonText}>Service Completed</Text>
+          </TouchableOpacity>
+        );
+      default:
+        return null;
+    }
+  };
+
+  const BackButton = () => (
+    <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+      <Icon name="arrow-left" size={24} color="#000" />
+    </TouchableOpacity>
+  );
+
+  if (loading) {
+    return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <View style={styles.headerLeft}>
-
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <Icon name="arrow-back" size={24} color="#000000" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Booking Progress</Text>
-          </View>
-          <TouchableOpacity>
-            <Text style={styles.shareText}>Share details</Text>
-          </TouchableOpacity>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#007AFF" />
+          <Text style={styles.loadingText}>Loading...</Text>
         </View>
+      </SafeAreaView>
+    );
+  }
 
-        <View style={styles.bookingCard}>
-      <BookingCard />
-        </View>
-
-        <View style={styles.progressContainer}>
-          <View style={styles.progressHeader}>
-            <Text style={styles.progressTitle}>Progress</Text>
-            <TouchableOpacity  onPress={() => navigation.navigate('outwardDetails')}>
-              <Text style={styles.viewDetailsText}>View Details</Text>
-            </TouchableOpacity>
-          </View>
-
-          {bookingSteps.map((step, index) => (
-            <View key={index} style={styles.stepContainer}>
-              <View style={styles.stepIndicator}>
-                {renderStepIcon(step.status)}
-                {index !== bookingSteps.length - 1 && (
-                  <View style={[
-                    styles.line,
-                    step.status === 'completed' ? styles.completedLine : styles.emptyLine
-                  ]} />
-                )}
-              </View>
-              <View style={styles.stepContent}>
-                <Text style={styles.stepTitle}>{step.title}</Text>
-                <Text style={styles.stepDate}>{step.date}</Text>
-              </View>
-            </View>
-          ))}
-        </View>
-
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity onPress={handleOpenSheet} style={styles.confirmButton}>
-            <Text style={styles.confirmButtonText}>Confirm completion</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.disputeButton}>
-            <Text style={styles.disputeButtonText}>Open dispute</Text>
+  if (error) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>Error: {error}</Text>
+          <TouchableOpacity
+            onPress={() => navigation.goBack()}
+            style={styles.errorButton}
+          >
+            <Text style={styles.errorButtonText}>Go Back</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
+    );
+  }
 
-      <OrderCompletionSheet
-  visible={isVisible}
-  onClose={() => setIsVisible(false)}
-/>
-    </>
+  const timelineData = getTimelineData(bookingDetails?.status);
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        <View style={styles.content}>
+          <View style={styles.header}>
+            <BackButton />
+          </View>
+
+          {bookingDetails && (
+            <BookCard
+              key={bookingDetails.id}
+              id={bookingDetails.id}
+              title={bookingDetails.title}
+              description={bookingDetails.description}
+              date={bookingDetails.booking_date}
+              status={bookingDetails.status}
+              location={bookingDetails.booking_location}
+              fileUrl={bookingDetails.file_url}
+              thumbnails={[
+                bookingDetails.thumbnail01,
+                bookingDetails.thumbnail02,
+                bookingDetails.thumbnail03,
+                bookingDetails.thumbnail04,
+              ].filter(Boolean)}
+            />
+          )}
+
+          <View style={styles.progressSection}>
+            <View style={styles.progressHeader}>
+              <Text style={styles.progressTitle}>Progress</Text>
+              <TouchableOpacity
+                onPress={() =>navigation.navigate('outwardDetails', { bookingId: id })}
+                
+              >
+                <Text style={styles.viewDetailsText}>View Details</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.timeline}>
+              {timelineData.map((item, index) => (
+                <View key={index} style={styles.timelineItem}>
+                  {index !== timelineData.length - 1 && (
+                    <View style={styles.timelineLine} />
+                  )}
+
+                  <View style={styles.timelineIconContainer}>
+                    {item.hasCheck ? (
+                      <View style={styles.timelineIconChecked}>
+                        <Icon name="check" size={16} color="white" />
+                      </View>
+                    ) : (
+                      <View style={styles.timelineIconUnchecked} />
+                    )}
+                  </View>
+
+                  <View style={styles.timelineContent}>
+                    <Text style={styles.timelineStatus}>{item.status}</Text>
+                    <Text style={styles.timelineTimestamp}>{item.timestamp}</Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          </View>
+
+          <View style={styles.actionContainer}>
+            {renderActionButton()}
+
+            {bookingDetails && bookingDetails.status !== 'completed' && (
+              <TouchableOpacity
+                onPress={handleOpenDispute}
+                disabled={isProcessing}
+                style={[
+                  styles.actionButton,
+                  styles.disputeButton,
+                  isProcessing && styles.processingButton,
+                ]}
+              >
+                <Text style={styles.disputeButtonText}>Open dispute</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
@@ -142,74 +347,58 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Color.background,
-    paddingTop: 30,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  content: {
+    paddingHorizontal: 16,
+    // paddingBottom: 32,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-
+    marginVertical: 14,
   },
-  headerTitle: {
+  backButton: {
+    padding: 8,
+    alignSelf: 'flex-start',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: '#666',
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 32,
+  },
+  errorText: {
+    color: '#ef4444',
+    textAlign: 'center',
+    fontSize: 16,
+    marginBottom: 24,
     fontFamily: 'AlbertSans-Medium',
-
-    fontSize: 18,
-    marginHorizontal: 16,
   },
-
-  headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  
-  },
-  shareText: {
-    color: Color.secondary,
-    fontFamily: 'AlbertSans-Bold',
-  },
-
-
-  bookingCard: {
-    // margin: 16,
-    padding: 16,
-
-
-  },
-  bookingIcon: {
-    width: 40,
-    height: 40,
+  errorButton: {
+    backgroundColor: '#007AFF',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
     borderRadius: 8,
   },
-  bookingDescription: {
-    fontFamily: 'AlbertSans-Regular',
-    marginTop: 8,
-    color: '#666666',
-  },
-  activeContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  dateText: {
-    fontFamily: 'AlbertSans-Regular',
-    color: '#666666',
-    fontSize: 12,
-  },
-  activeTag: {
-    backgroundColor: '#E8F5E9',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-  },
-  activeText: {
-    color: '#4CAF50',
+  errorButtonText: {
+    color: 'white',
+    fontSize: 16,
     fontFamily: 'AlbertSans-Medium',
-    fontSize: 12,
   },
-  progressContainer: {
-    flex: 1,
-    padding: 16,
+  progressSection: {
+    marginBottom: 16,
+    marginTop: 16,
   },
   progressHeader: {
     flexDirection: 'row',
@@ -218,93 +407,116 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   progressTitle: {
+    fontSize: 18,
     fontFamily: 'AlbertSans-Bold',
-    fontSize: 16,
+    color: '#1a1a1a',
   },
   viewDetailsText: {
     color: Color.secondary,
+    fontSize: 14,
     fontFamily: 'AlbertSans-Bold',
+    textDecorationColor:Color.secondary,
+    textDecorationLine: 'underline',
   },
-  stepContainer: {
-    flexDirection: 'row',
-    marginBottom: 24,
+  timeline: {
+    position: 'relative',
   },
-  stepIndicator: {
-    alignItems: 'center',
-    marginRight: 12,
+  timelineItem: {
+    position: 'relative',
+    paddingLeft: 40,
+    paddingBottom: 32,
   },
-  completedDot: {
+  timelineLine: {
+    position: 'absolute',
+    left: 25,
+    top: 24,
+    width: 2,
+    height: '100%',
+    backgroundColor: Color.secondary,
+  },
+  timelineIconContainer: {
+    position: 'absolute',
+    left: 15,
+    top: 4,
+  },
+  timelineIconChecked: {
     width: 24,
     height: 24,
-    justifyContent: 'center',
+    borderRadius: 12,
+    backgroundColor: Color.secondary,
     alignItems: 'center',
-    
+    justifyContent: 'center',
   },
-  emptyDot: {
+  timelineIconUnchecked: {
     width: 24,
     height: 24,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: '#EEEEEE',
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderColor: '#d1d5db',
+    backgroundColor: 'white',
   },
-  innerCircle: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: '#EEEEEE',
+  timelineContent: {
+    paddingLeft: 16,
   },
-  line: {
-    width: 2,
-    height: 40,
-    marginTop: 4,
-  },
-  completedLine: {
-    backgroundColor: Color.secondary,
-  },
-  emptyLine: {
-    backgroundColor: '#EEEEEE',
-  },
-  stepContent: {
-    flex: 1,
-  },
-  stepTitle: {
-    fontFamily: 'AlbertSans-Medium',
-    color: '#333333',
-  },
-  stepDate: {
-    fontFamily: 'AlbertSans-Regular',
-    color: '#666666',
-    fontSize: 12,
-    marginTop: 4,
-  },
-  buttonContainer: {
-    padding: 16,
-  },
-  confirmButton: {
-    backgroundColor: Color.primary,
-    borderRadius: 50,
-    padding: 16,
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  confirmButtonText: {
-    color: Color.secondary,
-    fontFamily: 'AlbertSans-Bold',
+  timelineStatus: {
     fontSize: 16,
+    fontWeight: '500',
+    color: '#1a1a1a',
+    fontFamily: 'AlbertSans-Medium',
+    marginBottom: 4,
+  },
+  timelineTimestamp: {
+    fontSize: 14,
+    color: '#6b7280',
+    fontFamily: 'AlbertSans-Regular',
+  },
+  actionContainer: {
+    flexDirection: 'row',
+    gap: 16,
+    marginVertical: 24,
+  },
+  actionButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 25,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  primaryButton: {
+    backgroundColor: '#60a5fa',
+  },
+  primaryButtonText: {
+    color: 'white',
+    fontSize: 15,
+    fontWeight: '500',
+  },
+  successButton: {
+    backgroundColor: '#4ade80',
+  },
+  successButtonText: {
+    color: 'white',
+    fontSize: 15,
+    fontFamily: 'AlbertSans-Medium',
+  },
+  disabledButton: {
+    backgroundColor: '#d1d5db',
+  },
+  disabledButtonText: {
+    color: '#6b7280',
+    fontSize: 15,
+    fontFamily: 'AlbertSans-Medium',
   },
   disputeButton: {
-    backgroundColor: '#FFEBEE',
-    borderRadius: 50,
-    padding: 16,
-    alignItems: 'center',
+    backgroundColor: '#fecaca',
   },
   disputeButtonText: {
-    color: '#F44336',
-    fontFamily: 'AlbertSans-Bold',
-    fontSize: 16,
+    color: '#dc2626',
+    fontSize: 15,
+    fontFamily: 'AlbertSans-Medium',
+  },
+  processingButton: {
+    opacity: 0.5,
   },
 });
 
-export default BookingProgress;
+export default OutwardProgress;

@@ -13,7 +13,7 @@ const Booking = () => {
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.headerTitle}>Bookings</Text>
-          <Text style={styles.headerHistory}>History</Text>
+          {/* <Text style={styles.headerHistory}>History</Text> */}
         </View>
         <TopTab.Navigator
           screenOptions={{
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Color.background,
-    paddingTop: 40,
+    // paddingTop: 40,
   },
   header: {
     flexDirection: 'row',

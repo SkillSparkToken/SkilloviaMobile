@@ -1,222 +1,580 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
-  Modal,
   StyleSheet,
+  ScrollView,
+  Alert,
+  ActivityIndicator,
+  Image,
+  Modal,
+  Platform,
+  Dimensions,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
+import { launchImageLibrary } from 'react-native-image-picker';
+import apiClient from '../../Hooks/Api';
 import { Color } from '../../Utils/Theme';
 
-const IDscreen = ({navigation}) => {
-  const [idType, setIdType] = useState('');
-  const [modalVisible, setModalVisible] = useState(false);
 
-  const idOptions = ['Residence permit', 'Driving license', 'International passport'];
+const { width } = Dimensions.get('window');
 
-  const handleSelectIdType = (option) => {
-    setIdType(option);
-    setModalVisible(false);
+// Helper function to convert ID type to API format
+const formatIdType = (type) => {
+  const typeMap = {
+    'Residence permit': 'residence-permit',
+    'Driving license': 'driving-license',
+    'International passport': 'international-passport'
   };
+  return typeMap[type] || '';
+};
+
+
+const formatDisplayType = (type) => {
+  const displayMap = {
+    'residence-permit': 'Residence permit',
+    'driving-license': 'Driving license',
+    'international-passport': 'International passport'
+  };
+  return displayMap[type] || type;
+};
+
+// Modal Component for ID Type Selection
+const IDTypeModal = ({ isVisible, onClose, onSelect }) => {
+  const idTypes = [
+    'Residence permit',
+    'Driving license',
+    'International passport'
+  ];
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <TouchableOpacity style={styles.header} onPress={() => navigation.goBack()}>
-        <Icon name="arrow-back-outline" size={24} color="#000" />
-        <Text style={styles.headerText}>Identification</Text>
-      </TouchableOpacity>
-
-      {/* ID Type Dropdown */}
-      <View style={styles.inputWrapper}>
-        <Text style={styles.label}>ID Type</Text>
-        <TouchableOpacity
-          style={styles.dropdown}
-          onPress={() => setModalVisible(true)}
-        >
-          <Text style={styles.dropdownText}>{idType || 'Select option'}</Text>
-          <Icon name="chevron-down-outline" size={20} color="#000" />
-        </TouchableOpacity>
-      </View>
-
-      {/* Upload ID Image */}
-      <View style={styles.uploadWrapper}>
-        <Text style={styles.label}>Upload ID image</Text>
-        <TouchableOpacity style={styles.uploadBox}>
-          <Icon name="cloud-upload-outline" size={40} color="#ccc" />
-          <Text style={styles.uploadText}>Click to upload image</Text>
-          <Text style={styles.fileHint}>SVG, PNG, or JPG</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Submit Button */}
-      <TouchableOpacity style={styles.submitButton}>
-        <Text style={styles.submitText}>Submit</Text>
-      </TouchableOpacity>
-
-      {/* Modal for Selecting ID Type */}
-      <Modal
-        visible={modalVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            {/* Close Button */}
+    <Modal
+      visible={isVisible}
+      transparent={true}
+      animationType="slide"
+      onRequestClose={onClose}
+    >
+      <View style={styles.modalOverlay}>
+        <View style={styles.modalContainer}>
+          <Text style={styles.modalTitle}>Select ID Type</Text>
+          
+          {idTypes.map((type) => (
             <TouchableOpacity
-              style={styles.modalClose}
-              onPress={() => setModalVisible(false)}
+              key={type}
+              style={styles.modalOption}
+              onPress={() => {
+                onSelect(type);
+                onClose();
+              }}
             >
-              <Icon name="close-outline" size={24} color="#000" />
+              <Text style={styles.modalOptionText}>{type}</Text>
+              <View style={styles.radioButton} />
             </TouchableOpacity>
-            <Text style={styles.modalTitle}>Select option</Text>
-            {idOptions.map((option, index) => (
-              <TouchableOpacity
-                key={index}
-                style={styles.modalOption}
-                onPress={() => handleSelectIdType(option)}
-              >
-                <Text style={styles.optionText}>{option}</Text>
-                <View
-                  style={[
-                    styles.radioCircle,
-                    idType === option && styles.radioCircleSelected,
-                  ]}
-                />
-              </TouchableOpacity>
-            ))}
-          </View>
+          ))}
+          
+          <TouchableOpacity style={styles.modalCloseButton} onPress={onClose}>
+            <Text style={styles.modalCloseText}>Cancel</Text>
+          </TouchableOpacity>
         </View>
-      </Modal>
-    </View>
+      </View>
+    </Modal>
   );
 };
 
-export default IDscreen;
+const Identification = ({ navigation }) => {
+  const [selectedType, setSelectedType] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [fetchingDocs, setFetchingDocs] = useState(false);
+  const [identityDocs, setIdentityDocs] = useState([]);
+  const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    fetchIdentityDocs();
+  }, []);
+
+  const fetchIdentityDocs = async () => {
+    try {
+      setFetchingDocs(true);
+      
+      const response = await apiClient.get('/settings/kyc/get/identity');
+      
+      if (response.data && response.data.data) {
+        const formattedDocs = response.data.data.map(doc => ({
+          id: doc.id,
+          fileUrl: doc.document_url,
+          type: doc.kyc_id_type,
+          createdAt: doc.created_at,
+          approvalStatus: doc.approval_status,
+          kycMethod: doc.kyc_method
+        }));
+        
+        setIdentityDocs(formattedDocs);
+      }
+    } catch (err) {
+      console.error('Error fetching identity documents:', err);
+      Alert.alert('Error', 'Failed to fetch identity documents');
+    } finally {
+      setFetchingDocs(false);
+    }
+  };
+
+  const selectImage = () => {
+    const options = {
+      title: 'Select ID Image',
+      mediaType: 'photo',
+      quality: 0.8,
+      maxWidth: 1024,
+      maxHeight: 1024,
+    };
+
+    launchImageLibrary(options, (response) => {
+      if (response.didCancel || response.error) {
+        return;
+      }
+
+      if (response.assets && response.assets[0]) {
+        setSelectedImage(response.assets[0]);
+      }
+    });
+  };
+
+  const handleDelete = async (id) => {
+    Alert.alert(
+      'Delete Document',
+      'Are you sure you want to delete this identity document?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setDeleting(true);
+              
+              await apiClient.delete(`/settings/kyc/delete/identity/${id}`);
+              
+              await fetchIdentityDocs();
+              Alert.alert('Success', 'Identity document deleted successfully!');
+            } catch (err) {
+              console.error('Error deleting identity document:', err);
+              Alert.alert('Error', 'Failed to delete identity document');
+            } finally {
+              setDeleting(false);
+            }
+          }
+        }
+      ]
+    );
+  };
+
+  const handleSubmit = async () => {
+    if (!selectedType) {
+      Alert.alert('Error', 'Please select an ID type');
+      return;
+    }
+    if (!selectedImage) {
+      Alert.alert('Error', 'Please select an ID document image');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('type', formatIdType(selectedType));
+      formData.append('file', {
+        uri: selectedImage.uri,
+        type: selectedImage.type,
+        name: selectedImage.fileName || 'id_document.jpg',
+      });
+
+      const response = await apiClient.post('/settings/kyc/upload/identity', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      Alert.alert('Success', 'ID document uploaded successfully!');
+      setSelectedImage(null);
+      setSelectedType('');
+      await fetchIdentityDocs();
+    } catch (err) {
+      console.error('Error uploading ID:', err);
+      Alert.alert('Error', 'Failed to upload ID. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getStatusStyle = (status) => {
+    switch (status) {
+      case 'approved':
+        return { backgroundColor: '#dcfce7', color: '#166534' };
+      case 'rejected':
+        return { backgroundColor: '#fecaca', color: '#991b1b' };
+      default:
+        return { backgroundColor: '#fef3c7', color: '#92400e' };
+    }
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString();
+  };
+
+  return (
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity 
+          style={styles.backButton} 
+          onPress={() => navigation.goBack()}
+        >
+          <Text style={styles.backButtonText}>← KYC</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity
+          style={[styles.saveButton, loading && styles.disabledButton]}
+          onPress={handleSubmit}
+          disabled={loading}
+        >
+          <Text style={styles.saveButtonText}>
+            {loading ? 'Uploading...' : 'Save changes'}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Form */}
+      <View style={styles.form}>
+        {/* ID Type Selection */}
+        <View style={styles.fieldContainer}>
+          <Text style={styles.label}>ID Type</Text>
+          <TouchableOpacity
+            style={styles.selectButton}
+            onPress={() => setIsModalOpen(true)}
+          >
+            <Text style={[styles.selectButtonText, !selectedType && styles.placeholderText]}>
+              {selectedType || 'Select option'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Image Upload */}
+        <View style={styles.fieldContainer}>
+          <Text style={styles.label}>Upload ID image</Text>
+          <TouchableOpacity style={styles.uploadContainer} onPress={selectImage}>
+            {selectedImage ? (
+              <View style={styles.selectedImageContainer}>
+                <Image source={{ uri: selectedImage.uri }} style={styles.selectedImage} />
+                <Text style={styles.selectedImageText}>
+                  {selectedImage.fileName || 'Selected image'}
+                </Text>
+              </View>
+            ) : (
+              <View style={styles.uploadPlaceholder}>
+                <Text style={styles.uploadIcon}>📄</Text>
+                <Text style={styles.uploadText}>Click to upload image</Text>
+                <Text style={styles.uploadSubtext}>SVG, PNG, or JPG</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Existing Documents Section */}
+      <View style={styles.documentsSection}>
+        <Text style={styles.sectionTitle}>Uploaded Identity Documents</Text>
+        
+        {fetchingDocs ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#1A4D00" />
+          </View>
+        ) : (
+          <View style={styles.documentsList}>
+            {identityDocs.length === 0 ? (
+              <View style={styles.emptyState}>
+                <Text style={styles.emptyStateText}>
+                  No identity documents uploaded yet
+                </Text>
+              </View>
+            ) : (
+              identityDocs.map((doc) => (
+                <View key={doc.id} style={styles.documentItem}>
+                  <View style={styles.documentInfo}>
+                    <Image
+                      source={{ uri: doc.fileUrl }}
+                      style={styles.documentThumbnail}
+                    />
+                    <View style={styles.documentDetails}>
+                      <Text style={styles.documentType}>
+                        {formatDisplayType(doc.type)}
+                      </Text>
+                      {/* <Text style={styles.documentDate}>
+                        Uploaded on {formatDate(doc.createdAt)}
+                      </Text> */}
+                      <View style={[styles.statusBadge, getStatusStyle(doc.approvalStatus)]}>
+                        <Text style={[styles.statusText, getStatusStyle(doc.approvalStatus)]}>
+                          {doc.approvalStatus.charAt(0).toUpperCase() + doc.approvalStatus.slice(1)}
+                        </Text>
+                      </View>
+                    </View>
+                  </View>
+                  
+                  <TouchableOpacity
+                    style={styles.deleteButton}
+                    onPress={() => handleDelete(doc._id)}
+                    disabled={deleting}
+                  >
+                    <Text style={styles.deleteButtonText}>🗑️</Text>
+                  </TouchableOpacity>
+                </View>
+              ))
+            )}
+          </View>
+        )}
+      </View>
+
+      {/* ID Type Selection Modal */}
+      <IDTypeModal
+        isVisible={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSelect={setSelectedType}
+      />
+    </ScrollView>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Color.background,
-    padding: 20,
+    padding: 16,
+    paddingTop: 40,
   },
   header: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 40,
-    marginTop: 30,
+    marginBottom: 24,
+    paddingTop: Platform.OS === 'ios' ? 20 : 0,
   },
-  headerText: {
-    fontSize: 18,
+  backButton: {
+    padding: 8,
+  },
+  backButtonText: {
+    fontSize: 16,
+    color: '#1A4D00',
     fontFamily: 'AlbertSans-Bold',
-    marginLeft: 10,
   },
-  inputWrapper: {
-    marginBottom: 20,
+  saveButton: {
+    backgroundColor: '#1A4D00',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  disabledButton: {
+    opacity: 0.5,
+  },
+  saveButtonText: {
+    color: '#fff',
+    fontFamily: 'AlbertSans-Bold',
+  },
+  form: {
+    marginBottom: 32,
+  },
+  fieldContainer: {
+    marginBottom: 24,
   },
   label: {
-    fontSize: 16,
-    marginBottom: 10,
-    color: '#555',
-    fontFamily: 'AlbertSans-Medium',
+    fontSize: 14,
+    fontWeight: '500',
+    marginBottom: 8,
+    color: '#374151',
+    fontFamily: 'AlbertSans-Bold',
   },
-  dropdown: {
+  selectButton: {
+    backgroundColor: Color.inputbg,
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    borderRadius: 8,
+    padding: 12,
+  },
+  selectButtonText: {
+    fontSize: 16,
+    color: '#374151',
+  },
+  placeholderText: {
+    color: '#9ca3af',
+  },
+  uploadContainer: {
+    borderWidth: 2,
+    borderColor: '#d1d5db',
+    borderStyle: 'dashed',
+    borderRadius: 8,
+    backgroundColor: Color.inputbg,
+    padding: 32,
+  },
+  uploadPlaceholder: {
+    alignItems: 'center',
+  },
+  uploadIcon: {
+    fontSize: 32,
+    marginBottom: 8,
+  },
+  uploadText: {
+    fontSize: 14,
+    color: '#6b7280',
+    fontFamily: 'AlbertSans-Bold',
+    marginBottom: 4,
+  },
+  uploadSubtext: {
+    fontSize: 12,
+    color: '#9ca3af',
+    fontFamily: 'AlbertSans-Regular',
+  },
+  selectedImageContainer: {
+    alignItems: 'center',
+  },
+  selectedImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  selectedImageText: {
+    fontSize: 14,
+    color: '#6b7280',
+  },
+  documentsSection: {
+    marginBottom: 32,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontFamily: 'AlbertSans-Bold',
+    marginBottom: 16,
+    color: '#111827',
+  },
+  loadingContainer: {
+    padding: 32,
+    alignItems: 'center',
+  },
+  documentsList: {
+    gap: 16,
+  },
+  emptyState: {
+    padding: 32,
+    alignItems: 'center',
+  },
+  emptyStateText: {
+    fontSize: 16,
+    color: '#6b7280',
+  },
+  documentItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    backgroundColor: Color.inputbg,
     borderWidth: 1,
-    borderColor: '#ddd',
-    padding: 15,
+    borderColor:Color.gray,
+    padding: 16,
     borderRadius: 8,
-    backgroundColor: Color.gray,
   },
-  dropdownText: {
-    fontSize: 16,
-    color: '#000',
-    fontFamily: 'AlbertSans-Medium',
-  },
-  uploadWrapper: {
-    marginBottom: 20,
-  },
-  uploadBox: {
+  documentInfo: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 30,
-    backgroundColor: Color.gray,
+    flex: 1,
   },
-  uploadText: {
-    marginTop: 10,
-    fontSize: 14,
-    color: '#aaa',
-    fontFamily: 'AlbertSans-Medium',
+  documentThumbnail: {
+    width: 48,
+    height: 48,
+    borderRadius: 4,
+    marginRight: 16,
   },
-  fileHint: {
-    fontSize: 12,
-    color: '#ccc',
+  documentDetails: {
+    flex: 1,
   },
-  submitButton: {
-    backgroundColor: Color.primary,
-    padding: 15,
-    alignItems: 'center',
-    borderRadius: 30,
-  },
-  submitText: {
-    color: Color.secondary,
+  documentType: {
     fontSize: 16,
     fontFamily: 'AlbertSans-Bold',
+    color: '#111827',
+    marginBottom: 4,
+  },
+  documentDate: {
+    fontSize: 14,
+    color: '#6b7280',
+    marginBottom: 8,
+  },
+  statusBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    alignSelf: 'flex-start',
+  },
+  statusText: {
+    fontSize: 12,
+    fontFamily: 'AlbertSans-Bold',
+  },
+  deleteButton: {
+    padding: 8,
+  },
+  deleteButtonText: {
+    fontSize: 20,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  modalContent: {
+  modalContainer: {
     backgroundColor: Color.background,
-    padding: 20,
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-  },
-  modalClose: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    padding: 5,
+    borderRadius: 12,
+    padding: 24,
+    width: width * 0.9,
+    maxWidth: 400,
   },
   modalTitle: {
     fontSize: 18,
     fontFamily: 'AlbertSans-Bold',
-    marginBottom: 20,
-    
+    marginBottom: 16,
+    color: '#111827',
   },
   modalOption: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#EEE',
-  },
-  optionText: {
-    fontSize: 16,
-    color: '#000',
-    fontFamily: 'AlbertSans-Medium',
-  },
-  radioCircle: {
-    width: 18,
-    height: 18,
-    borderRadius: 9,
+    backgroundColor: Color.inputbg,
     borderWidth: 1,
-    borderColor: '#555',
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderColor:Color.gray,
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 8,
   },
-  radioCircleSelected: {
-    borderColor: '#32CD32',
-    backgroundColor: '#32CD32',
+  modalOptionText: {
+    fontSize: 16,
+    color: '#374151',
+    fontFamily: 'AlbertSans-Regular',
+  },
+  radioButton: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+  },
+  modalCloseButton: {
+    backgroundColor: '#ddd',
+    padding: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  modalCloseText: {
+    fontSize: 16,
+    color: '#333',
+    fontFamily: 'AlbertSans-Bold',
   },
 });
+
+export default Identification;

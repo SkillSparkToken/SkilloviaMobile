@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -9,12 +9,15 @@ import {
   StyleSheet,
   Dimensions,
   StatusBar,
+  Modal,
 } from 'react-native';
 import { Color } from '../../Utils/Theme';
 
 const windowWidth = Dimensions.get('window').width;
 
 const CommunityScreen = ({navigation}) => {
+  const [showModal, setShowModal] = useState(false);
+
   const features = [
     {
       id: 1,
@@ -35,6 +38,14 @@ const CommunityScreen = ({navigation}) => {
       icon: '❤️'
     }
   ];
+
+  const handleCheckItOut = () => {
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+  };
 
   return (
     <>
@@ -82,11 +93,32 @@ const CommunityScreen = ({navigation}) => {
               </View>
             ))}
 
-            <TouchableOpacity onPress={()=> navigation.navigate("communityList")} style={styles.button}>
+            <TouchableOpacity onPress={handleCheckItOut} style={styles.button}>
               <Text style={styles.buttonText}>Check it out</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
+
+        {/* Coming Soon Modal */}
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={showModal}
+          onRequestClose={closeModal}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalIcon}>🚀</Text>
+              <Text style={styles.modalTitle}>Coming Soon!</Text>
+              <Text style={styles.modalDescription}>
+                We're working hard to bring you an amazing community experience. Stay tuned for updates!
+              </Text>
+              <TouchableOpacity onPress={closeModal} style={styles.modalButton}>
+                <Text style={styles.modalButtonText}>Got it</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       </SafeAreaView>
     </>
   );
@@ -166,6 +198,61 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   buttonText: {
+    fontFamily: 'AlbertSans-SemiBold',
+    color: Color.secondary,
+    fontSize: 16,
+  },
+  // Modal styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 30,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    width: '90%',
+    maxWidth: 300,
+  },
+  modalIcon: {
+    fontSize: 50,
+    marginBottom: 20,
+  },
+  modalTitle: {
+    fontFamily: 'AlbertSans-Bold',
+    fontSize: 24,
+    color: '#333',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  modalDescription: {
+    fontFamily: 'AlbertSans-Regular',
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 24,
+  },
+  modalButton: {
+    backgroundColor: Color.primary,
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 25,
+    alignItems: 'center',
+  },
+  modalButtonText: {
     fontFamily: 'AlbertSans-SemiBold',
     color: Color.secondary,
     fontSize: 16,
